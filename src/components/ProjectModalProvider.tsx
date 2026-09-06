@@ -133,7 +133,7 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-6xl max-h-[90vh] bg-card border border-border rounded-2xl overflow-hidden flex flex-col"
+              className="relative w-full max-w-6xl max-h-[90dvh] bg-card border border-border rounded-2xl overflow-hidden flex flex-col"
             >
               {/* Terminal View Chrome */}
               <CyberCodeWindowChrome
@@ -167,8 +167,8 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
 
               <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
                 {/* Image Section */}
-                <div className="md:w-3/5 bg-muted/20 relative overflow-hidden flex flex-col border-r border-border">
-                  <div className="flex-1 relative overflow-hidden group">
+                <div className="shrink-0 md:shrink md:w-3/5 min-h-0 bg-muted/20 relative overflow-hidden flex flex-col border-b md:border-b-0 md:border-r border-border">
+                  <div className="aspect-video max-h-[40dvh] md:aspect-auto md:max-h-none md:flex-1 md:min-h-0 relative overflow-hidden group">
                     <AnimatePresence initial={false} custom={direction}>
                       <motion.div
                         key={activeIndex}
@@ -208,7 +208,7 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
                               </span>
                             )}
                             {/* Expand Button */}
-                            <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity">
                               <button 
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -233,13 +233,13 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
                       <>
                         <button 
                           onClick={(e) => { e.stopPropagation(); paginate(-1); }}
-                          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-2 bg-background/60 hover:bg-background/80 border border-white/10 rounded-full transition-all opacity-0 group-hover:opacity-100"
+                          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-2 bg-background/60 hover:bg-background/80 border border-white/10 rounded-full transition-all opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100"
                         >
                           <ChevronLeft className="w-5 h-5" />
                         </button>
                         <button 
                           onClick={(e) => { e.stopPropagation(); paginate(1); }}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-2 bg-background/60 hover:bg-background/80 border border-white/10 rounded-full transition-all opacity-0 group-hover:opacity-100"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-2 bg-background/60 hover:bg-background/80 border border-white/10 rounded-full transition-all opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100"
                         >
                           <ChevronRight className="w-5 h-5" />
                         </button>
@@ -249,7 +249,7 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
 
                   {/* Thumbnail bar */}
                   {totalSlides > 1 && (
-                    <div className="flex gap-2 p-4 border-t border-border overflow-x-auto bg-background/50">
+                    <div className="flex gap-2 p-4 border-t border-border overflow-x-auto bg-background/50 shrink-0">
                       {hasBeforeAfter && (
                         <button
                           key="before-after-thumb"
@@ -294,7 +294,7 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
                 </div>
 
                 {/* Content Section */}
-                <div className="md:w-2/5 p-[6px] overflow-y-auto flex flex-col">
+                <div className="md:w-2/5 min-h-0 p-[6px] overflow-y-auto flex flex-col">
                   <div className="space-y-4 flex-1">
                       <CyberCodeTerminalWindow title="details.data" showDots={false}>
                         <div className="font-mono text-sm space-y-2">
