@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Folder, FolderOpen, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CyberCodeTerminalWindow, CyberCodeWindowChrome } from "@/components/cybercode/CyberCodeUIKit";
 import LazyImage from "./LazyImage";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 
 export type Tool = {
   name: string;
@@ -31,18 +32,17 @@ function ToolImageModal({
   const image = images[activeIndex];
   const hasNav = images.length > 1;
 
+  // Mounted only while the lightbox is open, so the lock runs for its lifetime.
+  useBodyScrollLock(true);
+
   useEffect(() => {
-    document.body.style.overflow = "hidden";
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
       if (e.key === "ArrowRight") onNavigate(1);
       if (e.key === "ArrowLeft") onNavigate(-1);
     };
     window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.body.style.overflow = "unset";
-      window.removeEventListener("keydown", handleKeyDown);
-    };
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose, onNavigate]);
 
   if (!image) return null;

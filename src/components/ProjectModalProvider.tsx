@@ -1,4 +1,4 @@
-import React, { useState, ReactNode, useEffect, useCallback } from "react";
+import React, { useState, ReactNode, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ExternalLink, Code2, Maximize2, ChevronLeft, ChevronRight } from "lucide-react";
 import { IconBrandGithub } from "@tabler/icons-react";
@@ -7,6 +7,7 @@ import BeforeAfterSlider from "./BeforeAfterSlider";
 import LazyImage from "./LazyImage";
 import { CyberCodeTerminalWindow, CyberCodeWindowChrome } from "./cybercode/CyberCodeUIKit";
 import { ProjectModalContext } from "./ProjectModalContext";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 
 export default function ProjectModalProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,6 +16,11 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
   const [activeIndex, setActiveIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [direction, setDirection] = useState(0);
+  // Set while a swipe is in flight so the slide's tap-to-zoom does not fire
+  // when the pointer is released at the end of a drag.
+  const didDrag = useRef(false);
+
+  useBodyScrollLock(isOpen);
 
   const hasBeforeAfter = !!(project?.beforeAfter?.before?.image && project?.beforeAfter?.after?.image);
   const totalSlides = (hasBeforeAfter ? 1 : 0) + (project?.images?.length || 0);
@@ -25,13 +31,11 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
     setActiveIndex(0);
     setDirection(0);
     setIsOpen(true);
-    document.body.style.overflow = "hidden";
   };
 
   const close = () => {
     setIsOpen(false);
     setIsFullscreen(false);
-    document.body.style.overflow = "unset";
   };
 
   const paginate = useCallback((newDirection: number) => {
@@ -77,6 +81,14 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, isFullscreen, paginate, navigateProject]);
+
+  // Distance x velocity, so a short flick and a long slow drag both register.
+  const SWIPE_THRESHOLD = 10000;
+  const swipePower = (offset: number, velocity: number) => Math.abs(offset) * velocity;
+
+  // The before/after slide owns its own horizontal drag (the comparison
+  // handle), so paging by swipe is disabled there to avoid fighting it.
+  const canSwipe = totalSlides > 1 && !(hasBeforeAfter && activeIndex === 0);
 
   const variants = {
     enter: (direction: number) => ({
@@ -181,7 +193,18 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
                           x: { type: "spring", stiffness: 300, damping: 30 },
                           opacity: { duration: 0.2 }
                         }}
-                        className="absolute inset-0"
+                        drag={canSwipe ? "x" : false}
+                        dragConstraints={{ left: 0, right: 0 }}
+                        dragElastic={0.18}
+                        onDragStart={() => { didDrag.current = true; }}
+                        onDragEnd={(_, { offset, velocity }) => {
+                          const swipe = swipePower(offset.x, velocity.x);
+                          if (swipe < -SWIPE_THRESHOLD) paginate(1);
+                          else if (swipe > SWIPE_THRESHOLD) paginate(-1);
+                          // Outlast the click that follows the pointer release.
+                          window.setTimeout(() => { didDrag.current = false; }, 0);
+                        }}
+                        className={`absolute inset-0 ${canSwipe ? "touch-pan-y" : ""}`}
                       >
                         {hasBeforeAfter && activeIndex === 0 ? (
                           <div className="w-full h-full relative p-6 flex items-center justify-center bg-muted/10">
@@ -192,7 +215,10 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
                             />
                           </div>
                         ) : project.images?.[activeIndex - (hasBeforeAfter ? 1 : 0)] ? (
-                          <div className="w-full h-full relative cursor-zoom-in" onClick={() => setIsFullscreen(true)}>
+                          <div
+                            className="w-full h-full relative cursor-zoom-in"
+                            onClick={() => { if (!didDrag.current) setIsFullscreen(true); }}
+                          >
                             {/* We only use layoutId for the image that is NOT currently being animated out */}
                             <LazyImage
                               layoutId={!isFullscreen ? `project-image-${project.slug}-${activeIndex}` : undefined}

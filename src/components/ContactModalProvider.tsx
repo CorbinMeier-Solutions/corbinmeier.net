@@ -6,6 +6,7 @@ import { CloudflareTurnstile } from "@/components/CloudflareTurnstile";
 import { contact } from "@/data/contact";
 import { homeHero } from "@/data/home";
 import type { ContactInfoItem } from "@/data/types";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { CyberCodeTerminalWindow, CyberCodeButton, CyberCodeTerminalLine, CyberCodeWindowChrome } from "@/components/cybercode/CyberCodeUIKit";
 import { ContactModalContext } from "./ContactModalContext";
 
@@ -20,6 +21,8 @@ const TURNSTILE_SITE_KEY = import.meta.env.TURNSTILE_SITE_KEY || "1x000000000000
 
 export default function ContactModalProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
+
+  useBodyScrollLock(isOpen);
 
   // Form states maintained in provider to persist when closed/reopened
   const [form, setForm] = useState({
@@ -45,12 +48,10 @@ export default function ContactModalProvider({ children }: { children: ReactNode
     }
     setIsOpen(true);
     setTurnstileInitialized(true);
-    document.body.style.overflow = "hidden";
   };
 
   const close = () => {
     setIsOpen(false);
-    document.body.style.overflow = "unset";
   };
 
   // Intercept all clicks to "/contact" globally
