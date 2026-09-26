@@ -71,11 +71,11 @@ export default function About() {
               className="mt-6"
             >
               <CyberCodeTerminalLine output className="mb-0">
-                <Typewriter as="span" className="text-accent">{about.sidebarLabel}</Typewriter>
+                <span className="text-accent">{about.sidebarLabel}</span>
               </CyberCodeTerminalLine>
               <div className="h-px bg-border w-full my-3" />
               <CyberCodeTerminalLine output className="mb-0 italic">
-                <Typewriter as="span">&quot;{about.sidebarQuote}&quot;</Typewriter>
+                &quot;{about.sidebarQuote}&quot;
               </CyberCodeTerminalLine>
             </CyberCodeTerminalWindow>
           </motion.div>
@@ -90,14 +90,14 @@ export default function About() {
                 className={section.panelClassName ?? "mb-12"}
               >
                 <h2 className={section.headingClassName ?? "text-h2 font-mono mb-6"}>
-                  <Typewriter as="span">{section.heading}</Typewriter>
+                  {section.heading}
                 </h2>
                 {section.paragraphs.map((paragraph, index) => (
                   <p
                     key={index}
                     className={`text-lg text-muted-foreground leading-relaxed${index < section.paragraphs.length - 1 ? " mb-6" : ""}`}
                   >
-                    <Typewriter as="span">{paragraph}</Typewriter>
+                    {paragraph}
                   </p>
                 ))}
               </CyberCodeTerminalWindow>
@@ -105,17 +105,15 @@ export default function About() {
 
             <CyberCodeTerminalWindow title="EOF" icon={<Terminal className="w-3 h-3" />} showDots={false} className="text-left">
               <h2 className={about.closingSection.headingClassName}>
-                <Typewriter as="span">{about.closingSection.heading}</Typewriter>
+                {about.closingSection.heading}
               </h2>
               <p className="text-muted-foreground mb-6">
-                <Typewriter as="span">
-                  {about.closingSection.paragraphs[0]}{" "}
-                  <span className="font-bold text-foreground underline decoration-accent decoration-2 underline-offset-4">{about.closingSection.boldFragment}</span>{" "}
-                  {about.closingSection.paragraphs[1]}
-                </Typewriter>
+                {about.closingSection.paragraphs[0]}{" "}
+                <span className="font-bold text-foreground underline decoration-accent decoration-2 underline-offset-4">{about.closingSection.boldFragment}</span>{" "}
+                {about.closingSection.paragraphs[1]}
               </p>
               <CyberCodeTerminalLine prompt=">" className="mb-4">
-                <Typewriter as="span">initiate_contact --propose</Typewriter>
+                initiate_contact --propose
               </CyberCodeTerminalLine>
               <div className="flex justify-start">
                 <CyberCodeButton

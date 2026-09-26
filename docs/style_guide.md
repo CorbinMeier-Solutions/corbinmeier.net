@@ -135,3 +135,51 @@ green/cyan/purple values).
 *   `CyberCodeGlitchHeading` is reserved for the homepage `<h1>` only. Every
     other page heading uses the plain `Geist Mono` display style above - no
     glitch animation elsewhere on the site.
+
+---
+
+## 5. Spacing Scale
+
+Four gaps, converged on the values already dominant across the site rather
+than invented fresh. Exposed as `@layer components` classes in
+`src/globals.css` (extend that list before reaching for an ad hoc
+margin/padding/gap value):
+
+*   **Section padding** (`.section-container`): `px-6 sm:px-10 py-10
+    sm:py-16` - a top-level section's own padding (Footer included).
+*   **Page top clearance** (`PageShell`): `pt-16 lg:pt-6 pb-10` - room below
+    the fixed mobile header / above the sidebar-offset desktop content.
+*   **Header-to-content gap** (`.page-header-gap`): `mb-16` - the space below
+    a page's own `<header>` (eyebrow + h1 + lead) before its first section.
+*   **Section-to-section gap** (`.section-gap`): `mb-16` - the space between
+    two top-level sections stacked in a page's body.
+*   **Card/grid gap** (`.card-grid-gap`): `gap-6` - the space between
+    repeating items in a card grid.
+
+## 6. Shared Components
+
+*   **`PageSection`** (`src/components/PageSection.tsx`): eyebrow, heading,
+    lead description, then children, built on the spacing scale above.
+    `headingLevel={1}` renders a page's own `<h1>` header (`.page-header-gap`
+    below it); `headingLevel={2}` (default) renders a section further down
+    the page (`.section-gap` below it). Every page adopts this in place of
+    hand-rolled header/section markup.
+*   **`DataTable`** (`src/components/DataTable.tsx`): the shared table for
+    tabular content (first consumer: `/pricing`). Hairline Navy borders,
+    Panel Navy header row, `Geist Mono` uppercase labels
+    (`tracking-[0.2em]`, Slate Gray), `Geist` body copy in Fog Gray. Below
+    640px each row collapses into its own stacked label/value card - never a
+    horizontal scroll.
+
+## 7. Text Reveal (Motion Rule)
+
+The typing/reveal effect (`Typewriter`, `src/components/cybercode/
+Typewriter.tsx`) runs **only** on a page's own `h1`, its eyebrow, and its
+lead description/flavor text - i.e. only inside a `PageSection` with
+`headingLevel={1}` and `reveal`. Body copy, cards, lists, tables, and any
+heading further down the page render static; wrapping them in `Typewriter`
+is a defect. `Typewriter` itself checks `prefers-reduced-motion` and renders
+the full text immediately, with no cursor, when the visitor has asked for
+less motion; `App.tsx` wraps the site in `<MotionConfig reducedMotion="user">`
+so every other framer-motion animation (fade/slide-in, nav pill glide)
+respects the same setting.

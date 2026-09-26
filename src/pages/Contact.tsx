@@ -207,10 +207,10 @@ export default function Contact() {
                   </div>
                   <div>
                     <p className="text-xs font-bold uppercase tracking-widest text-muted mb-1">
-                      <Typewriter durationMs={800} as="span">{infoItem.label}</Typewriter>
+                      {infoItem.label}
                     </p>
                     <p className="text-lg font-medium">
-                      <Typewriter durationMs={800} as="span">{infoItem.value}</Typewriter>
+                      {infoItem.value}
                     </p>
                   </div>
                 </div>

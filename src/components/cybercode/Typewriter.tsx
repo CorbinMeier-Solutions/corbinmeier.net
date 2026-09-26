@@ -105,7 +105,23 @@ export default function Typewriter({
   const [cursorVisible, setCursorVisible] = useState(showCursor);
   const elementRef = useRef<HTMLElement | null>(null);
 
+  // A visitor who asked the OS for less motion gets the full text immediately,
+  // with no blinking cursor - this is the only reveal effect on the site, so
+  // it is the only place that needs to check. The initial value is read
+  // lazily from `useState` (not set from inside an effect) so it is correct
+  // on the very first render; the effect below only subscribes to changes.
+  const [reducedMotion, setReducedMotion] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
   useEffect(() => {
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onChange = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    query.addEventListener("change", onChange);
+    return () => query.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    if (reducedMotion) return;
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
@@ -122,10 +138,10 @@ export default function Typewriter({
     }
 
     return () => observer.disconnect();
-  }, [delayMs]);
+  }, [delayMs, reducedMotion]);
 
   useEffect(() => {
-    if (!started || totalChars <= 0) return;
+    if (reducedMotion || !started || totalChars <= 0) return;
 
     // Add +/- 0.6 seconds (600ms) random jitter. Kept in the effect so render stays pure.
     const jitteredDuration = durationMs + (Math.random() - 0.5) * 1200;
@@ -141,7 +157,7 @@ export default function Typewriter({
     }, speedMs);
 
     return () => clearInterval(interval);
-  }, [started, totalChars, durationMs]);
+  }, [started, totalChars, durationMs, reducedMotion]);
 
   useEffect(() => {
     if (visibleCharCount >= totalChars && totalChars > 0 && showCursor) {
@@ -153,6 +169,10 @@ export default function Typewriter({
     }
   }, [visibleCharCount, totalChars, showCursor]);
 
+  if (reducedMotion) {
+    return <Component className={className}>{children}</Component>;
+  }
+
   const cursorInsertedRef = { inserted: false };
   const [renderedChildren] = renderLimit(
     children,
@@ -163,7 +183,7 @@ export default function Typewriter({
 
   // If typing is complete, and cursor still hasn't been inserted (e.g. empty or exact fit)
   const isComplete = visibleCharCount >= totalChars;
-  
+
   return (
     <Component ref={elementRef} className={className}>
       {renderedChildren}
