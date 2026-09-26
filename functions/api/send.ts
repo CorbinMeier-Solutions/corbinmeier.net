@@ -5,7 +5,7 @@ import { Resend } from "resend";
 
 interface CloudflareEnv {
   RESEND_API_KEY: string;
-  PERSONAL_EMAIL: string;
+  FORM_TO_ADDRESSES: string;
   TURNSTILE_SECRET: string;
 }
 
@@ -115,14 +115,22 @@ ${body.message ? `Message preview:\n${body.message}\n\n` : ""}- Corbin`;
       },
     });
 
-    // Send notification to site owner
-    if (!env.PERSONAL_EMAIL) {
-      console.error("PERSONAL_EMAIL is not defined in the environment.");
+    // Send notification to site owner. FORM_TO_ADDRESSES is comma-separated by
+    // contract, so it is parsed into a list rather than passed as one string.
+    // One send per recipient, so a single bad address cannot block the others,
+    // belongs with the move off Resend (#17).
+    const formToAddresses = (env.FORM_TO_ADDRESSES || "")
+      .split(",")
+      .map((address) => address.trim())
+      .filter(Boolean);
+
+    if (formToAddresses.length === 0) {
+      console.error("FORM_TO_ADDRESSES is not defined in the environment.");
     }
 
     const ownerNotificationPromise = resend.emails.send({
       from: "corbinmeier.net <contact@corbinmeier.net>",
-      to: [env.PERSONAL_EMAIL || "contact@corbinmeier.net"], // Fallback to avoid crash if missing
+      to: formToAddresses.length > 0 ? formToAddresses : ["contact@corbinmeier.net"],
       subject: `New contact: ${body.subject}`,
       text: `New contact submission:\n\nName: ${body.firstName || ""} ${
         body.lastName || ""

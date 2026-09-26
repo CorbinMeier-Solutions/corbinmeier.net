@@ -4,5 +4,6 @@
 RESEND_API_KEY="re_replace-me"
 # renamed 2026-09-26 from TURNSTILE_SECRET_KEY
 TURNSTILE_SECRET="1x0000000000000000000000000000000AA"
-# PERSONAL_EMAIL moved 2026-09-26 to wrangler.toml [vars]: an address is not a
-# credential. Delete the Pages secret of that name so the two cannot disagree.
+# The form recipient moved 2026-09-26 to wrangler.toml [vars] as
+# FORM_TO_ADDRESSES (was the PERSONAL_EMAIL secret): an address is not a
+# credential. Delete the old Pages secret so the two cannot disagree.

@@ -10,11 +10,8 @@ pages_build_output_dir = "dist"
 [vars]
 # added 2026-09-26
 CLOUDFLARE_ACCOUNT_ID = "56cc31643fbd29d5b3fe4da66d5323c3"
-# Moved here from a Pages secret: an address is not a credential, and this one is
-# already committed in src/main.tsx. Legacy name kept per the standard, so
-# functions/api/send.ts reads env.PERSONAL_EMAIL unchanged.
-# added 2026-09-26
-PERSONAL_EMAIL = "corbinmeier.solutions@gmail.com"
+# renamed 2026-09-26 from PERSONAL_EMAIL
+FORM_TO_ADDRESSES = "corbinmeier.solutions@gmail.com"
 # added 2026-09-26
 BUSINESS_TIMEZONE = "America/Los_Angeles"
 
@@ -23,7 +20,7 @@ BUSINESS_TIMEZONE = "America/Los_Angeles"
 [env.preview.vars]
 # added 2026-09-26
 CLOUDFLARE_ACCOUNT_ID = "56cc31643fbd29d5b3fe4da66d5323c3"
-# added 2026-09-26
-PERSONAL_EMAIL = "corbinmeier.solutions@gmail.com"
+# renamed 2026-09-26 from PERSONAL_EMAIL
+FORM_TO_ADDRESSES = "corbinmeier.solutions@gmail.com"
 # added 2026-09-26
 BUSINESS_TIMEZONE = "America/Los_Angeles"
