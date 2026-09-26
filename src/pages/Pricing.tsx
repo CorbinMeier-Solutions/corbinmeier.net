@@ -19,6 +19,7 @@ export default function Pricing() {
       <main className="page-container">
         <PageSection
           headingLevel={1}
+          reveal
           prompt="cat ./pricing/menu.md"
           eyebrow={pricing.eyebrow}
           heading={
