@@ -11,7 +11,7 @@ export const pricing: PricingContent = {
 
   tiersHeading: "Pick a starting point",
   tiersIntro:
-    "One-time build prices. None of them carry a required monthly, because hosting a straightforward site genuinely costs nothing to run.",
+    "One-time build prices. Every package includes connecting your domain and setting up your business email, and none of them carry a required monthly, because hosting a straightforward site genuinely costs nothing to run.",
   tiers: [
     {
       id: "starter",
@@ -24,6 +24,7 @@ export const pricing: PricingContent = {
         "One to three pages, built to your content",
         "Contact form delivered straight to your inbox",
         "Set up so search engines can find and list you",
+        "Your domain connected and a business email address set up",
         "No monthly cost at all if you take the keys",
       ],
     },
@@ -46,9 +47,9 @@ export const pricing: PricingContent = {
       id: "growth",
       name: "Growth",
       build: "$4,200",
-      tagline: "You update it yourself",
+      tagline: "For owners who'd rather publish it themselves",
       summary:
-        "Foundation plus the machinery to run the site without calling me. A private admin area, a familiar editor, and somewhere to put large photos and video. Bought separately these run $5,200.",
+        "For owners who want to write and post their own updates instead of calling me. Everything in Foundation, plus a private admin area, a familiar editor, and somewhere to put large photos and video. Bought separately these run $5,200.",
       includes: [
         "Private admin area, one owner account",
         "Write and format content like a word processor",
@@ -60,8 +61,22 @@ export const pricing: PricingContent = {
 
   maintenanceHeading: "Then decide who maintains it",
   maintenanceIntro:
-    "This is the part most quotes hide. A finished site still needs someone to keep it current and keep an eye on it. That someone can be you.",
+    "This is the part most quotes hide. A finished site still needs someone to keep it current and keep an eye on it. That someone can be me, or it can be you.",
   maintenanceOptions: [
+    {
+      id: "maintained",
+      name: "I maintain it",
+      price: "$150 - $500/mo",
+      summary:
+        "Your email keeps arriving, your site stays online, and updates are handled - I stay on as an administrator and keep the site healthy so you never have to think about it. The rate is set per project against what I am actually responsible for: $150 covers a straightforward site, and it climbs from there as that list grows. You see the list, agreed in writing, before you agree to a number. It costs less than hiring a freelancer for the same work, and far less than handing it to an employee once you count the hours pulled off their real job.",
+      points: [
+        "Content and copy changes handled as they come up",
+        "Security patches and dependency updates applied for you",
+        "Uptime monitoring, so I know when your site goes down or has issues",
+        "Backups with 1 click restoration",
+        "Debugging when something stops behaving the way it should",
+      ],
+    },
     {
       id: "self-managed",
       name: "You maintain it",
@@ -73,20 +88,6 @@ export const pricing: PricingContent = {
         "You keep the logins whether or not we work together again",
         "Platform costs go straight to you, and for a straightforward site those are $0",
         "You can bring me back later as an administrator whenever you want",
-      ],
-    },
-    {
-      id: "maintained",
-      name: "I maintain it",
-      price: "$150 - $500/mo",
-      summary:
-        "I stay on as an administrator and keep the site healthy. The rate is set per project against what I am actually responsible for: $150 covers a straightforward site, and it climbs from there as that list grows. You see the list, agreed in writing, before you agree to a number.",
-      points: [
-        "Content and copy changes handled as they come up",
-        "Security patches and dependency updates applied for you",
-        "Uptime monitoring, so I know when your site goes down or has issues",
-        "Backups with 1 click restoration",
-        "Debugging when something stops behaving the way it should",
       ],
     },
   ],
@@ -132,23 +133,23 @@ export const pricing: PricingContent = {
         },
         {
           id: "domain-connection",
-          name: "Domain Connection / Move From an Old Host",
-          upfront: "Quoted",
+          name: "Domain connection / move from an old host",
+          upfront: "$300",
           recurring: null,
           prerequisites: [],
           level: 2,
           responsibility:
-            "Point your existing domain at the new site, or move it over from wherever it lives today, untangling the DNS and email records along the way so nothing goes down in the switch.",
+            "Every build already includes connecting a domain that's ready to point at the new site. This is the harder case: moving a domain that is registered or hosted somewhere else, with its existing DNS and email records carried over as part of the work.",
         },
         {
           id: "business-email",
-          name: "Business Email Setup",
-          upfront: "Quoted",
+          name: "Business Email Setup & Authentication",
+          upfront: "$400",
           recurring: null,
           prerequisites: [],
           level: 3,
           responsibility:
-            "A business email address on your own domain, authenticated so it lands in inboxes instead of spam folders.",
+            "Every build already includes setting up a business email address on your own domain. This is the harder case: connecting your email provider and adding the records that prove mail really comes from your business (SPF, DKIM, DMARC), plus send/receive testing.",
         },
       ],
     },
