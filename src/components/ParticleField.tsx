@@ -3,7 +3,6 @@ import {
   createEllipseSprite,
   createRadialSprite,
   easeInOutCubic,
-  fadeEnvelope,
   lightenRgbTriplet,
   readAccentRgb,
 } from "@/lib/particleFieldSprites";
@@ -36,11 +35,20 @@ const LARGE_COUNT = 10;
 const LARGE_RADIUS = 30;
 const LARGE_MAX_ALPHA = 0.2;
 
+// Dimmed to ~5% opacity and anchored to the bottom edge (their vertical
+// center sits on the viewport's bottom edge, so the glow rises from below)
+// per #31; offsets are horizontal-only now that there is no vertical center
+// to offset from.
 const LIGHTS = [
-  { width: 400, height: 100, alpha: 0.6, offsetX: 0, offsetY: 0 },
-  { width: 350, height: 250, alpha: 0.3, offsetX: -50, offsetY: 0 },
-  { width: 100, height: 80, alpha: 0.2, offsetX: 80, offsetY: -50 },
+  { width: 400, height: 100, alpha: 0.05, offsetX: 0 },
+  { width: 350, height: 250, alpha: 0.03, offsetX: -50 },
+  { width: 100, height: 80, alpha: 0.02, offsetX: 80 },
 ];
+
+// Particles fade in once, staggered over this many milliseconds after
+// mount, then hold their resting opacity forever - no fade-out cycle (#31).
+const FADE_IN_STAGGER_MS = 4000;
+const FADE_IN_DURATION_MS = 2000;
 
 const PARTICLE_TINTS = [0.15, 0.35, 0.55];
 const LIGHT_TINTS = [0.25, 0.4, 0.6];
@@ -50,13 +58,19 @@ const ACCENT_POLL_FRAMES = 15;
 type Drifter = {
   radius: number;
   maxAlpha: number;
+  /** Fixed brightness variance (0-1) picked once at spawn; unlike the old
+   * per-leg peak this never resets, so the particle holds a steady resting
+   * alpha instead of fading out between legs. */
+  restAlpha: number;
+  /** Absolute `performance.now()` timestamp the fade-in begins; staggered
+   * per particle so they don't all pop in together. */
+  fadeInStart: number;
   fromX: number;
   fromY: number;
   toX: number;
   toY: number;
   fromScale: number;
   toScale: number;
-  peakAlpha: number;
   legStart: number;
   legDuration: number;
 };
@@ -69,20 +83,22 @@ function randomBand(width: number, height: number) {
   };
 }
 
-function newLeg(drifter: Pick<Drifter, "radius">, width: number, height: number, fromX: number, fromY: number, fromScale: number, now: number): Drifter {
+/** Position/scale for the next leg only - alpha lives on the drifter itself
+ * (`restAlpha`/`fadeInStart`) and is untouched by `Object.assign` below, so
+ * a drifter's resting brightness survives every leg change. */
+type Leg = Pick<Drifter, "fromX" | "fromY" | "toX" | "toY" | "fromScale" | "toScale" | "legStart" | "legDuration">;
+
+function newLeg(drifter: Pick<Drifter, "radius">, width: number, height: number, fromX: number, fromY: number, fromScale: number, now: number): Leg {
   const spread = drifter.radius * 2;
   const targetX = Math.min(width, Math.max(0, fromX + (Math.random() - 0.5) * 2 * spread));
   const targetY = Math.min(height * 0.9, Math.max(height * 0.1, fromY + (Math.random() - 0.5) * 2 * spread));
   return {
-    radius: drifter.radius,
-    maxAlpha: 0,
     fromX,
     fromY,
     toX: targetX,
     toY: targetY,
     fromScale,
     toScale: 0.3 + Math.random() * 0.7,
-    peakAlpha: Math.random(),
     legStart: now,
     legDuration: 2000 + Math.random() * 8000,
   };
@@ -91,7 +107,13 @@ function newLeg(drifter: Pick<Drifter, "radius">, width: number, height: number,
 function makeDrifter(radius: number, maxAlpha: number, width: number, height: number, now: number): Drifter {
   const { x, y } = randomBand(width, height);
   const leg = newLeg({ radius }, width, height, x, y, 0.3 + Math.random() * 0.7, now);
-  return { ...leg, radius, maxAlpha };
+  return {
+    ...leg,
+    radius,
+    maxAlpha,
+    restAlpha: 0.5 + Math.random() * 0.5,
+    fadeInStart: now + Math.random() * FADE_IN_STAGGER_MS,
+  };
 }
 
 function reduceCount(base: number, factor: number) {
@@ -162,7 +184,8 @@ export default function ParticleField() {
       const x = drifter.fromX + (drifter.toX - drifter.fromX) * t;
       const y = drifter.fromY + (drifter.toY - drifter.fromY) * t;
       const scale = drifter.fromScale + (drifter.toScale - drifter.fromScale) * t;
-      const alpha = fadeEnvelope(elapsed / drifter.legDuration) * drifter.peakAlpha * drifter.maxAlpha;
+      const fadeIn = easeInOutCubic(Math.min(1, Math.max(0, (now - drifter.fadeInStart) / FADE_IN_DURATION_MS)));
+      const alpha = fadeIn * drifter.restAlpha * drifter.maxAlpha;
       return { x, y, scale, alpha };
     };
 
@@ -194,10 +217,13 @@ export default function ParticleField() {
         const phase = (now / period) * Math.PI * 2 + index;
         const breathe = 1 + 0.08 * Math.sin(phase);
         const driftX = light.offsetX + 12 * Math.sin(phase * 0.6);
-        const driftY = light.offsetY + 8 * Math.cos(phase * 0.5);
+        // Vertical drift halved and clamped to stay near the bottom edge -
+        // the light's center anchors on `height` (viewport bottom), not the
+        // midpoint, so the glow rises from below (#31).
+        const driftY = 4 * Math.cos(phase * 0.5);
         const w = light.width * breathe;
         const h = light.height * breathe;
-        context.drawImage(sprite, width / 2 + driftX - w / 2, height / 2 + driftY - h / 2, w, h);
+        context.drawImage(sprite, width / 2 + driftX - w / 2, height + driftY - h / 2, w, h);
       });
     };
 

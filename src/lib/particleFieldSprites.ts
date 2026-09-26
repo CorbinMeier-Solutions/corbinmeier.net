@@ -65,8 +65,3 @@ export function easeInOutCubic(t: number): number {
   const clamped = Math.min(1, Math.max(0, t));
   return clamped < 0.5 ? 4 * clamped ** 3 : 1 - (-2 * clamped + 2) ** 3 / 2;
 }
-
-/** Smooth 0 -> 1 -> 0 envelope across a leg's duration, for "fade in then out". */
-export function fadeEnvelope(t: number): number {
-  return Math.sin(Math.PI * Math.min(1, Math.max(0, t)));
-}

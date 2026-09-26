@@ -28,18 +28,17 @@ showcase. Dark-only; no light theme.
 ## Typography
 
 - **Display** (`h1`-`h3`, nav labels, eyebrow/kicker, buttons, form labels,
-  stat/tag chips): `Geist Mono`, fallback `ui-monospace, SFMono-Regular,
-  Menlo, monospace`. 500-700 weight, tight tracking at hero scale
-  (`tracking-tighter`), uppercase + `tracking-[0.2em]` for eyebrows/labels
-  only. Fog Gray, Signal Blue for emphasized spans.
+  stat/tag chips): `Geist Mono`, fallback `ui-monospace, SFMono-Regular, Menlo,
+  monospace`. 500-700 weight, tight tracking at hero scale (`tracking-tighter`),
+  uppercase + `tracking-[0.2em]` for eyebrows/labels only. Fog Gray, Signal
+  Blue for emphasized spans.
 - **Body** (paragraphs, descriptions, form values, footer copy): `Geist`,
   fallback `ui-sans-serif, system-ui, sans-serif`. 400 weight,
   `leading-relaxed`, Fog Gray; Slate Gray for de-emphasized copy.
 
 ## UI Components & Micro-Animations
 
-Primitives: `src/components/cybercode/CyberCodeUIKit.tsx`, retinted to this
-palette (`ACCENT` map reads from these tokens).
+Primitives: `src/components/cybercode/CyberCodeUIKit.tsx`, retinted to this palette (`ACCENT` map reads from these tokens).
 
 - **Cards:** flat `#0d1420` fill, `1px solid #1e2836`, `rounded-xl`. No
   backdrop blur, no gradient fill.
@@ -52,12 +51,13 @@ palette (`ACCENT` map reads from these tokens).
 - **Error state** (`CyberCodeStatusPill`, form validation): Alert Red text at
   normal weight, `1px solid rgba(229,72,77,0.35)` border,
   `rgba(229,72,77,0.08)` background tint. Never `font-bold`.
-- **Ambient background:** one effect only, `ConsoleBackdrop`
-  (`src/components/ConsoleBackdrop.tsx`), mounted by `PageShell` on every
-  page - `.crt-scanlines` + `.crt-vignette`, static, no motion, no blur.
-  Never blurred glow blobs, line/dot grids, mesh gradients, a
-  cursor-following spotlight, a particle field, a custom cursor, or floating
-  code snippets.
+- **Ambient background:** one effect only, `ConsoleBackdrop` (mounted once in
+  `App.tsx`, persists across routes) - canvas particle + light field
+  (`ParticleField.tsx`) under `.crt-scanlines`/`.crt-vignette`. Bottom-anchored
+  breathing lights (~5% opacity); particles fade in once, staggered, then
+  hold resting opacity forever (no fade-out), drifting gently; both tint with
+  the page accent. No `filter: blur`, cursor spotlight, custom cursor, or
+  floating code snippets.
 - **`CyberCodeGlitchHeading`:** homepage `<h1>` only. Every other page
   heading uses the plain `Geist Mono` display style - no glitch animation
   elsewhere.

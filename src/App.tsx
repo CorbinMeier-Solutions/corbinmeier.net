@@ -4,6 +4,7 @@ import { MotionConfig } from "framer-motion";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
+import ConsoleBackdrop from "@/components/ConsoleBackdrop";
 import ScrollToTop from "@/components/ScrollToTop";
 import ProjectModalProvider from "@/components/ProjectModalProvider";
 import PersonJsonLd from "@/components/PersonJsonLd";
@@ -61,6 +62,9 @@ function App() {
         <ContactModalProvider>
           <CyberCodeStyles />
           <PersonJsonLd />
+          {/* Mounted once here, above the route switch, so it survives
+              client-side navigation instead of remounting per page (#31). */}
+          <ConsoleBackdrop />
           <ScrollToTop />
           <Routes>
             <Route path="/" element={<SiteLayout><Home /></SiteLayout>} />
