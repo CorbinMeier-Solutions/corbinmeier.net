@@ -9,6 +9,13 @@ Superseded decisions and incidents. Live decisions are in `CLAUDE.md` (local-onl
   guide had specified matrix rain in the homepage hero instead; that never shipped.
   The blobs had already been disabled on touch devices (2026-08-16) because
   scroll-animated blur layers blanked the page on iOS Safari.
+- **Background, same day, second change**: the static CRT backdrop (#19) was
+  kept but an accent-tinted particle + light field was added beneath it (#26),
+  from a 2014-era CreateJS "projector" effect Corbin supplied; then dimmed and
+  anchored to the bottom edge (#31). The style-guide rationale below that rules
+  out particle fields predates this.
+- **Pricing levels**: first framed as "price rises with level" (#23); replaced
+  by "every price reflects the work" (#29).
 - **Positioning**: the site leaned toward SaaS; it now sells a one-time website
   build plus monthly DNS/email/website management (Scope approved 2026-09-26).
 - **Pricing naming**: "a la carte" menu grouped by technology replaced by
