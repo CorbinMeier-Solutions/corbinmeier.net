@@ -1,8 +1,8 @@
 # standard: dev-vars@2026-09-14
-# Secrets only, placeholders only. Plain values live in wrangler.json vars.
+# Secrets only, placeholders only. Plain values live in wrangler.toml [vars].
 # added 2026-09-26
 RESEND_API_KEY="re_replace-me"
 # renamed 2026-09-26 from TURNSTILE_SECRET_KEY
 TURNSTILE_SECRET="1x0000000000000000000000000000000AA"
-# added 2026-09-26
-PERSONAL_EMAIL="you@example.com"
+# PERSONAL_EMAIL moved 2026-09-26 to wrangler.toml [vars]: an address is not a
+# credential. Delete the Pages secret of that name so the two cannot disagree.

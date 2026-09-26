@@ -1,0 +1,29 @@
+# standard: wrangler-config@2026-09-14
+name = "corbinmeier-net"
+compatibility_date = "2026-09-26"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "dist"
+
+# Plain variables only. Secrets: npx wrangler pages secret put <NAME> --project-name corbinmeier-net
+# (production AND preview). Environments do NOT inherit [vars]: [env.preview.vars]
+# repeats every variable. Each variable carries the date it was added on the line above.
+[vars]
+# added 2026-09-26
+CLOUDFLARE_ACCOUNT_ID = "56cc31643fbd29d5b3fe4da66d5323c3"
+# Moved here from a Pages secret: an address is not a credential, and this one is
+# already committed in src/main.tsx. Legacy name kept per the standard, so
+# functions/api/send.ts reads env.PERSONAL_EMAIL unchanged.
+# added 2026-09-26
+PERSONAL_EMAIL = "corbinmeier.solutions@gmail.com"
+# added 2026-09-26
+BUSINESS_TIMEZONE = "America/Los_Angeles"
+
+# Preview always notifies the developer, never the owner: preview traffic is testing.
+# Here they are the same person, so the values match production.
+[env.preview.vars]
+# added 2026-09-26
+CLOUDFLARE_ACCOUNT_ID = "56cc31643fbd29d5b3fe4da66d5323c3"
+# added 2026-09-26
+PERSONAL_EMAIL = "corbinmeier.solutions@gmail.com"
+# added 2026-09-26
+BUSINESS_TIMEZONE = "America/Los_Angeles"

@@ -26,14 +26,19 @@ Local secrets go in `.dev.vars` (gitignored); the keys are listed in
 
 ## Deployment (Cloudflare Pages)
 
+Configuration lives in `wrangler.toml`, which is committed. Note that a
+committed config file takes over from the Pages dashboard's bindings UI, so
+variables are changed here rather than there.
+
 - Build command: `npm run build`
-- Output directory: `dist`
+- Output directory: `dist` (`pages_build_output_dir`)
 - Compatibility flag: `nodejs_compat` (required by the email library in Functions)
-- Secrets (production and preview): `RESEND_API_KEY`, `TURNSTILE_SECRET`,
-  `PERSONAL_EMAIL`, via `npx wrangler pages secret put <KEY>`
-- All three are required. A missing `RESEND_API_KEY` or `TURNSTILE_SECRET`
-  makes `functions/api/send.ts` return 500 rather than accept a submission
-  it cannot verify.
+- Plain variables: `wrangler.toml` `[vars]`, repeated in `[env.preview.vars]`
+  because environments do not inherit them.
+- Secrets (production and preview): `RESEND_API_KEY` and `TURNSTILE_SECRET`,
+  via `npx wrangler pages secret put <KEY> --project-name corbinmeier-net`.
+  Both are required: a missing one makes `functions/api/send.ts` return 500
+  rather than accept a submission it cannot verify.
 
 ## Content notes
 
