@@ -5,7 +5,7 @@ export const site: SiteContent = {
   navItems: [
     { name: "Projects", href: "/projects" },
     { name: "Pricing", href: "/pricing" },
-    { name: "Tools", href: "/tools" },
+    { name: "Workshop", href: "/workshop" },
     { name: "FAQ", href: "/faq" },
     { name: "About", href: "/about" },
   ],

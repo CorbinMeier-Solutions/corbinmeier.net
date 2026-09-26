@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { MotionConfig } from "framer-motion";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
@@ -13,10 +13,9 @@ import { CyberCodeStyles } from "@/components/cybercode/CyberCodeUIKit";
 import Home from "@/pages/Home";
 import About from "@/pages/About";
 import Projects from "@/pages/Projects";
-import Tools from "@/pages/Tools";
+import Workshop from "@/pages/Workshop";
 import Faq from "@/pages/Faq";
 import Pricing from "@/pages/Pricing";
-import AiSetup from "@/pages/AiSetup";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";
 
@@ -71,10 +70,13 @@ function App() {
             <Route path="/about" element={<SiteLayout><About /></SiteLayout>} />
             <Route path="/contact" element={<ContactRouteRedirect />} />
             <Route path="/projects" element={<SiteLayout><Projects /></SiteLayout>} />
-            <Route path="/tools" element={<SiteLayout><Tools /></SiteLayout>} />
+            <Route path="/workshop" element={<SiteLayout><Workshop /></SiteLayout>} />
             <Route path="/faq" element={<SiteLayout><Faq /></SiteLayout>} />
             <Route path="/pricing" element={<SiteLayout><Pricing /></SiteLayout>} />
-            <Route path="/ai-setup" element={<SiteLayout><AiSetup /></SiteLayout>} />
+            {/* #30: /tools became /workshop and /ai-setup folded in as one
+                Workshop entry - keep both old addresses working. */}
+            <Route path="/tools" element={<Navigate to="/workshop" replace />} />
+            <Route path="/ai-setup" element={<Navigate to="/workshop" replace />} />
             <Route path="/privacy-policy" element={<SiteLayout><PrivacyPolicy /></SiteLayout>} />
             <Route path="/terms-of-service" element={<SiteLayout><TermsOfService /></SiteLayout>} />
             <Route path="*" element={<CrtNotFound />} />

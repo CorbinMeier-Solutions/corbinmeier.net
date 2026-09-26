@@ -224,37 +224,42 @@ export interface SiteContent {
   builtWithLine: string;
 }
 
-export interface AiSetupValueProp {
-  icon: "ShieldCheck" | "DollarSign" | "Zap";
+export interface WorkshopImage {
+  src: string;
+  label?: string;
+  caption?: string;
+}
+
+/** One side project, shown with full specs rather than a teaser. `stack` and
+ *  `replaced` are omitted when there's nothing real to say - never
+ *  fabricated to fill the row. */
+export interface WorkshopEntry {
+  slug: string;
+  name: string;
+  tagline?: string;
+  status?: string;
+  date?: string;
+  problem: string;
+  built: string;
+  stack?: string;
+  replaced?: string;
+  images?: WorkshopImage[];
+}
+
+/** A section of the Workshop page. `entries` starts empty for a category
+ *  with nothing to show yet - the section still renders, with a note, so
+ *  the category exists ready for the next entry. */
+export interface WorkshopCategory {
+  id: string;
   title: string;
-  body: string;
+  entries: WorkshopEntry[];
 }
 
-export interface AiSetupChecklistItem {
-  text: string;
-}
-
-export interface AiSetupPricingPackage {
-  title: string;
-  body: string;
-  note?: string;
-}
-
-export interface AiSetupContent {
+export interface WorkshopContent {
   eyebrow: string;
-  headingLine1: string;
+  headingPre: string;
   headingAccent: string;
   intro: string;
-  valueProps: AiSetupValueProp[];
-  stackHeadingPre: string;
-  stackHeadingAccent: string;
-  stackBody: string;
-  checklist: AiSetupChecklistItem[];
-  pricingHeadingPre: string;
-  pricingHeadingAccent: string;
-  pricingTierLabel: string;
-  price: string;
-  priceNote: string;
-  packages: AiSetupPricingPackage[];
-  ctaLabel: string;
+  emptyCategoryNote: string;
+  categories: WorkshopCategory[];
 }

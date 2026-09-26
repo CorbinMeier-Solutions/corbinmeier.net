@@ -28,7 +28,7 @@ export const CONTACT_PALETTE: PaletteName = "blue";
 export const ROUTE_THEME: Record<string, PaletteName> = {
   "/": "blue",
   "/projects": "green",
-  "/tools": "yellow",
+  "/workshop": "yellow",
   "/faq": "orange",
   "/about": "red",
   "/pricing": "teal",

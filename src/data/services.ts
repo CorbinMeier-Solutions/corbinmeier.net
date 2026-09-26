@@ -17,7 +17,7 @@ export const servicesSection: ServicesSectionContent = {
       title: "Private AI Deployment",
       desc: "Professional deployment of private, uncensored AI (Hermes) on your own cloud infrastructure. Total data sovereignty without per-user markups.",
       icon: "Brain",
-      link: "/ai-setup",
+      link: "/workshop",
     },
     {
       id: "apps",
