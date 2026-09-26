@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
-import BackgroundMotion from "@/components/BackgroundMotion";
-import ErrorBoundary from "@/components/ErrorBoundary";
+import ConsoleBackdrop from "@/components/ConsoleBackdrop";
 import { cn } from "@/lib/utils";
 import { useThemeTransition } from "@/hooks/useThemeTransition";
 import type { ThemeName } from "@/lib/theme";
@@ -23,11 +22,7 @@ export default function PageShell({
 
   return (
     <div className={cn("relative min-h-screen pt-16 lg:pt-6 pb-10", className)}>
-      {/* Purely ambient, and the layer most likely to hit an engine-specific
-          compositing bug - so it fails to nothing rather than to a blank page. */}
-      <ErrorBoundary label="BackgroundMotion">
-        <BackgroundMotion />
-      </ErrorBoundary>
+      <ConsoleBackdrop />
       {children}
     </div>
   );

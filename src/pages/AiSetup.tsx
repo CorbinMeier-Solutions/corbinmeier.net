@@ -87,7 +87,7 @@ export default function AiSetup() {
             className="relative"
           >
             <div className="aspect-square rounded-3xl bg-accent/5 border border-accent/10 flex items-center justify-center overflow-hidden">
-               <div className="absolute inset-0 opacity-20 blueprint-bg"></div>
+               <div className="absolute inset-0 crt-scanlines"></div>
                <Server className="w-48 h-48 text-accent/20" />
                <Cpu className="w-24 h-24 text-accent absolute animate-pulse" />
             </div>

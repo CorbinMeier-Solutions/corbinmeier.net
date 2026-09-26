@@ -20,8 +20,8 @@ controlled, dependable - not a hacker showcase.
     one glowing accent color, no visual noise.
 *   **Key Design Techniques:** flat dark panels with hairline borders, a
     single accent color used sparingly (never decoratively), glow reserved
-    for hover/focus/interactive states only, one subtle ambient backdrop
-    effect confined to the homepage hero.
+    for hover/focus/interactive states only, one static CRT backdrop
+    (faint scanlines + edge vignette) behind every page.
 
 ---
 
@@ -122,10 +122,13 @@ green/cyan/purple values).
     `rgba(229,72,77,0.08)` background tint. Never `font-bold`.
 
 ### Ambient / Background Effects
-*   One effect only: `CyberCodeMatrixRain` (from `CyberCodeBackdrops.tsx`),
-    recolored to Signal Blue (`#3b82f6`), opacity capped low (`~0.08–0.12`,
-    below the kit's own default), mounted only inside the homepage hero
-    section - not global, not on any other page.
+*   One effect only: `ConsoleBackdrop` (`src/components/ConsoleBackdrop.tsx`),
+    mounted by `PageShell` on every page. It is two static CSS layers:
+    `.crt-scanlines` (a 1px line every 3px in the page accent at 5% opacity)
+    and `.crt-vignette` (a black radial shadow toward the edges). No motion,
+    no blur.
+*   Never the 2023+ "AI landing page" tells: blurred glow blobs, square line
+    grids, dot grids, mesh gradients, or a cursor-following spotlight.
 *   No particle field, no custom cursor, no floating code snippets - these
     are explicitly out of scope to keep the site feeling controlled rather
     than busy.
