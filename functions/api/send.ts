@@ -1,6 +1,7 @@
 import React from "react";
 import { render } from "@react-email/render";
 import { EmailTemplate } from "../../src/components/EmailTemplateContactConfirmation";
+import { EmailTemplateOwnerNotification } from "../../src/components/EmailTemplateOwnerNotification";
 import { Resend } from "resend";
 
 interface CloudflareEnv {
@@ -128,15 +129,32 @@ ${body.message ? `Message preview:\n${body.message}\n\n` : ""}- Corbin`;
       console.error("FORM_TO_ADDRESSES is not defined in the environment.");
     }
 
+    // Both parts, from the same fields: a text-only client renders nothing from
+    // an HTML-only send, and an HTML-only send scores worse with spam filters.
+    const ownerHtml = await render(
+      React.createElement(EmailTemplateOwnerNotification, {
+        firstName: body.firstName || undefined,
+        lastName: body.lastName || undefined,
+        email: body.email || "",
+        phone: body.phone || undefined,
+        subject: body.subject || undefined,
+        message: body.message || undefined,
+      })
+    );
+
+    const ownerText = `New contact submission:\n\nName: ${body.firstName || ""} ${
+      body.lastName || ""
+    }\nEmail: ${body.email}\nPhone: ${body.phone || ""}\nSubject: ${
+      body.subject || ""
+    }\n\nMessage:\n${body.message || "(no message)"}`;
+
     const ownerNotificationPromise = resend.emails.send({
       from: "corbinmeier.net <contact@corbinmeier.net>",
       to: formToAddresses.length > 0 ? formToAddresses : ["contact@corbinmeier.net"],
+      replyTo: body.email,
       subject: `New contact: ${body.subject}`,
-      text: `New contact submission:\n\nName: ${body.firstName || ""} ${
-        body.lastName || ""
-      }\nEmail: ${body.email}\nPhone: ${body.phone || ""}\nSubject: ${
-        body.subject || ""
-      }\n\nMessage:\n${body.message || "(no message)"}`,
+      html: ownerHtml,
+      text: ownerText,
     });
 
     const [confRes, ownerRes] = await Promise.all([
