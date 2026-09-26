@@ -10,16 +10,19 @@ pages_build_output_dir = "dist"
 [vars]
 # added 2026-09-26
 CLOUDFLARE_ACCOUNT_ID = "56cc31643fbd29d5b3fe4da66d5323c3"
+# added 2026-09-26
+MAIL_FROM = "Corbin Meier <contact@mail.corbinmeier.net>"
 # renamed 2026-09-26 from PERSONAL_EMAIL
 FORM_TO_ADDRESSES = "corbinmeier.solutions@gmail.com"
 # added 2026-09-26
 BUSINESS_TIMEZONE = "America/Los_Angeles"
 
 # Preview always notifies the developer, never the owner: preview traffic is testing.
-# Here they are the same person, so the values match production.
 [env.preview.vars]
 # added 2026-09-26
 CLOUDFLARE_ACCOUNT_ID = "56cc31643fbd29d5b3fe4da66d5323c3"
+# added 2026-09-26
+MAIL_FROM = "Corbin Meier <contact@mail.corbinmeier.net>"
 # renamed 2026-09-26 from PERSONAL_EMAIL
 FORM_TO_ADDRESSES = "corbinmeier.solutions@gmail.com"
 # added 2026-09-26
