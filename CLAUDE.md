@@ -47,3 +47,5 @@ use `li + li` for list spacing.
 
 `src/components/FaqJsonLd.tsx` derives FAQPage structured data from these entries
 automatically, stripping tags for the plain-text `acceptedAnswer`.
+
+@scripts/README.md
