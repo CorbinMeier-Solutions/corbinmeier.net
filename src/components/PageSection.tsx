@@ -14,7 +14,7 @@ interface PageSectionProps {
   headingLevel?: 1 | 2;
   lead?: ReactNode;
   /** Wraps the prompt/eyebrow/heading/lead in the site's text-reveal
-   *  Typewriter effect. Per docs/style_guide.md's motion rule this belongs
+   *  Typewriter effect. Per .claude/rules/style.md's motion rule this belongs
    *  only on a page's own header (headingLevel 1) - default off. */
   reveal?: boolean;
   children?: ReactNode;

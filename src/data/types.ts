@@ -68,7 +68,7 @@ export interface PricingLineItem {
 }
 
 /** One row of the level legend shown above the add-ons table - named by what
- *  happens if the add-on breaks, per docs/style_guide.md. */
+ *  happens if the add-on breaks, per .claude/rules/style.md. */
 export interface PricingLevelInfo {
   level: 1 | 2 | 3;
   name: string;

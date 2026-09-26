@@ -42,4 +42,4 @@ Local secrets go in `.dev.vars` (gitignored); the keys are listed in
 
 ## Design
 
-Visual rules: `docs/style_guide.md` ("The Steady Console").
+Visual rules: `.claude/rules/style.md` ("The Steady Console").

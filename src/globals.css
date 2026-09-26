@@ -19,7 +19,7 @@
 }
 
 :root {
-  /* "The Steady Console" - dark-navy terminal theme, see docs/style_guide.md. Dark-only. */
+  /* "The Steady Console" - dark-navy terminal theme, see .claude/rules/style.md. Dark-only. */
   --background: #0a0e17;
   --foreground: #c9d1d9;
   --primary: #c9d1d9;
@@ -142,7 +142,7 @@ html.theme-contact, html.theme-contact body {
     );
   }
 
-  /* Spacing scale (docs/style_guide.md "Spacing Scale"): the four gaps used
+  /* Spacing scale (.claude/rules/style.md "Spacing Scale"): the four gaps used
      sitewide, converged on the values already dominant across pages rather
      than invented fresh. Extend this list before reaching for an ad hoc
      margin/padding/gap value. */

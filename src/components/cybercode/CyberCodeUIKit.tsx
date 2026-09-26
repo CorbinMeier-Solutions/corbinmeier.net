@@ -24,7 +24,7 @@ import { useRevealOnScroll } from "./useCyberCodeEffects";
 /**
  * Only two channels: "primary" (Signal Blue, the site's sole accent - used
  * for nearly everything) and "danger" (Alert Red, reserved for genuine error
- * states only - see docs/style_guide.md). Both read from the global theme
+ * states only - see .claude/rules/style.md). Both read from the global theme
  * tokens in globals.css, so a future palette change propagates automatically
  * instead of drifting out of sync with a second hardcoded palette.
  */

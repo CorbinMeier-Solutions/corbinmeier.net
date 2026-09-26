@@ -15,7 +15,7 @@ interface DataTableProps<T> {
   className?: string;
 }
 
-/** Shared table for tabular content (docs/style_guide.md "Data Table").
+/** Shared table for tabular content (.claude/rules/style.md "Data Table").
  *  Hairline-bordered rows with a Panel Navy header above 640px; below that,
  *  each row collapses into its own stacked label/value card instead of
  *  scrolling horizontally. */
