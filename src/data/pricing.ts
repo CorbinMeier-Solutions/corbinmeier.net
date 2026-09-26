@@ -22,8 +22,8 @@ export const pricing: PricingContent = {
         "A small custom site for a business that needs to be found, look credible, and be easy to contact. Hand-coded rather than assembled from a template, and fast on a phone.",
       includes: [
         "One to three pages, built to your content",
-        "Contact form delivered straight to your inbox",
-        "Set up so search engines can find and list you",
+        "Contact form submissions sent straight to your email",
+        "Set up so search engines can crawl and understand your site",
         "Your domain connected and a business email address set up",
         "No monthly cost at all if you take the keys",
       ],
@@ -68,7 +68,7 @@ export const pricing: PricingContent = {
       name: "I maintain it",
       price: "$150 - $500/mo",
       summary:
-        "Your email keeps arriving, your site stays online, and updates are handled - I stay on as an administrator and keep the site healthy so you never have to think about it. The rate is set per project against what I am actually responsible for: $150 covers a straightforward site, and it climbs from there as that list grows. You see the list, agreed in writing, before you agree to a number. It costs less than hiring a freelancer for the same work, and far less than handing it to an employee once you count the hours pulled off their real job.",
+        "I stay on as an administrator, watching your email and site for problems, applying updates, and keeping things healthy so you don't have to. The rate is set per project against what I am actually responsible for: $150 covers a straightforward site, and it climbs from there as that list grows. You see the list, agreed in writing, before you agree to a number. It costs less than hiring a freelancer for the same work, and far less than handing it to an employee once you count the hours pulled off their real job.",
       points: [
         "Content and copy changes handled as they come up",
         "Security patches and dependency updates applied for you",
@@ -206,7 +206,7 @@ export const pricing: PricingContent = {
           prerequisites: [],
           level: 2,
           responsibility:
-            "Sign-up forms that screen out bots before they reach you, so your list stays real people and your mail does not get flagged as spam. The monthly covers the delivery service: $10 up to 3,000 emails a month, $60 above that.",
+            "Sign-up forms that screen out bots before they reach you, so your list stays real people. The monthly covers the sending service: $10 up to 3,000 emails a month, $60 above that.",
         },
         {
           id: "estimator",
