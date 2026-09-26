@@ -29,8 +29,11 @@ Local secrets go in `.dev.vars` (gitignored); the keys are listed in
 - Build command: `npm run build`
 - Output directory: `dist`
 - Compatibility flag: `nodejs_compat` (required by the email library in Functions)
-- Secrets (production and preview): `RESEND_API_KEY`, `TURNSTILE_SECRET_KEY`,
+- Secrets (production and preview): `RESEND_API_KEY`, `TURNSTILE_SECRET`,
   `PERSONAL_EMAIL`, via `npx wrangler pages secret put <KEY>`
+- All three are required. A missing `RESEND_API_KEY` or `TURNSTILE_SECRET`
+  makes `functions/api/send.ts` return 500 rather than accept a submission
+  it cannot verify.
 
 ## Content notes
 

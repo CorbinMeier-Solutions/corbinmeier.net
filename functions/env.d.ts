@@ -5,5 +5,5 @@
 interface CloudflareEnv {
   RESEND_API_KEY: string;
   PERSONAL_EMAIL: string;
-  TURNSTILE_SECRET_KEY: string;
+  TURNSTILE_SECRET: string;
 }

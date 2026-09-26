@@ -6,7 +6,7 @@ import { Resend } from "resend";
 interface CloudflareEnv {
   RESEND_API_KEY: string;
   PERSONAL_EMAIL: string;
-  TURNSTILE_SECRET_KEY: string;
+  TURNSTILE_SECRET: string;
 }
 
 interface ContactRequestBody {
@@ -30,38 +30,47 @@ export const onRequestPost: PagesFunction<CloudflareEnv> = async (context) => {
     );
   }
 
+  // Refuse rather than skip. Gating verification on the secret's own presence
+  // meant an absent or renamed binding silently turned the bot check off while
+  // the form carried on accepting submissions.
+  if (!env.TURNSTILE_SECRET) {
+    console.error("TURNSTILE_SECRET is not defined in the environment.");
+    return new Response(
+      JSON.stringify({ error: "The contact form is unavailable right now." }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
   try {
     const body = (await request.json()) as ContactRequestBody;
     const { turnstileToken } = body;
 
     // Turnstile verification
-    if (env.TURNSTILE_SECRET_KEY) {
-      if (!turnstileToken) {
-        return new Response(
-          JSON.stringify({ error: "Security check token missing." }),
-          { status: 403, headers: { "Content-Type": "application/json" } }
-        );
-      }
+    if (!turnstileToken) {
+      return new Response(
+        JSON.stringify({ error: "Security check token missing." }),
+        { status: 403, headers: { "Content-Type": "application/json" } }
+      );
+    }
 
-      const formData = new FormData();
-      formData.append("secret", env.TURNSTILE_SECRET_KEY);
-      formData.append("response", turnstileToken);
-      const ip = request.headers.get("CF-Connecting-IP");
-      if (ip) formData.append("remoteip", ip);
+    const formData = new FormData();
+    formData.append("secret", env.TURNSTILE_SECRET);
+    formData.append("response", turnstileToken);
+    const ip = request.headers.get("CF-Connecting-IP");
+    if (ip) formData.append("remoteip", ip);
 
-      const url = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
-      const result = await fetch(url, {
-        body: formData,
-        method: "POST",
-      });
+    const url = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+    const result = await fetch(url, {
+      body: formData,
+      method: "POST",
+    });
 
-      const outcome = (await result.json()) as { success: boolean };
-      if (!outcome.success) {
-        return new Response(
-          JSON.stringify({ error: "Security check failed. Please try again." }),
-          { status: 403, headers: { "Content-Type": "application/json" } }
-        );
-      }
+    const outcome = (await result.json()) as { success: boolean };
+    if (!outcome.success) {
+      return new Response(
+        JSON.stringify({ error: "Security check failed. Please try again." }),
+        { status: 403, headers: { "Content-Type": "application/json" } }
+      );
     }
 
     const resend = new Resend(env.RESEND_API_KEY);
