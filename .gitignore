@@ -52,3 +52,6 @@ dist/
 
 # local-only legal/business document bundles - not web code
 docs/*.zip
+
+# project contract: local-only, repo is public
+CLAUDE.md
