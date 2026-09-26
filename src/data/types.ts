@@ -46,13 +46,17 @@ export interface ServicesSectionContent {
   items: ServiceItem[];
 }
 
-/** A single à-la-carte feature on the pricing menu. `recurring` is null when
- *  the feature carries no monthly cost. `prerequisites` holds the ids of other
- *  line items that must be bought first, rather than their display names, so
- *  the card can resolve each one's real price instead of restating it by hand
- *  and drifting out of sync. Empty when the feature stands on its own.
- *  `responsibility` is the point of the menu, not a footnote: it states in
- *  plain terms what the price actually buys. */
+/** A single add-on to a package. `recurring` is null when the feature
+ *  carries no monthly cost. `prerequisites` holds the ids of other line
+ *  items (add-ons, or the standalone `databaseTier`/`customSolution`) that
+ *  must be bought first, rather than their display names, so the table can
+ *  resolve each one's real price instead of restating it by hand and
+ *  drifting out of sync. Empty when the feature stands on its own.
+ *  `responsibility` is the point of the table, not a footnote: it states in
+ *  plain terms what the price actually buys - empty only for an add-on whose
+ *  real cost depends entirely on the client's existing setup (a "Quoted"
+ *  price). `level` is omitted for an add-on that sits outside every level,
+ *  such as `customSolution`. */
 export interface PricingLineItem {
   id: string;
   name: string;
@@ -60,12 +64,25 @@ export interface PricingLineItem {
   recurring: string | null;
   prerequisites: string[];
   responsibility: string;
+  level?: 1 | 2 | 3;
 }
 
-export interface PricingGroup {
+/** One row of the level legend shown above the add-ons table - named by what
+ *  happens if the add-on breaks, per docs/style_guide.md. */
+export interface PricingLevelInfo {
+  level: 1 | 2 | 3;
+  name: string;
+  description: string;
+}
+
+/** A category of add-ons, ordered Level 1 -> 3 inside it. `note`, when set,
+ *  is shown once above the category's table (e.g. the maintenance-plan aside
+ *  above "Publishing Your Own Content"). */
+export interface PricingCategory {
   id: string;
   title: string;
   blurb: string;
+  note?: string;
   items: PricingLineItem[];
 }
 
@@ -113,10 +130,17 @@ export interface PricingContent {
   maintenanceHeading: string;
   maintenanceIntro: string;
   maintenanceOptions: PricingMaintenanceOption[];
-  menuHeadingPre: string;
-  menuHeadingAccent: string;
-  menuIntro: string;
-  groups: PricingGroup[];
+  addOnsHeadingPre: string;
+  addOnsHeadingAccent: string;
+  addOnsIntro: string;
+  levelLegend: PricingLevelInfo[];
+  categories: PricingCategory[];
+  /** Not shown as its own row - resolved into a fixed "Needs: database
+   *  (usage billed $30 - $200/mo)" line on any add-on whose
+   *  `prerequisites` includes its id. */
+  databaseTier: PricingLineItem;
+  /** Shown after every category, outside all of them - no `level`. */
+  customSolution: PricingLineItem;
   noticesHeading: string;
   notices: PricingNotice[];
   ctaHeadingPre: string;
