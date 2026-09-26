@@ -1,12 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  /* "Geist Variable" is the family the self-hosted @fontsource-variable package
+     registers; plain "Geist" stays behind it for anyone who has the static face
+     installed locally. */
+  --font-sans: "Geist Variable", "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   /* Display/heading font - kept as "font-serif" so existing className usage
      across the site doesn't need renaming; now points at Geist Mono per the
      "Steady Console" style guide instead of DM Serif Display. */
-  --font-serif: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-serif: "Geist Mono Variable", "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);

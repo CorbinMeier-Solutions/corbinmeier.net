@@ -4,6 +4,11 @@ import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
+// Self-hosted so no visitor's browser has to contact a third-party font CDN
+// before they have consented to anything. Variable faces, 100-900, matching the
+// axis the Google Fonts URL used to request.
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
 import './globals.css';
 
 // Last-resort fallback. Deliberately styled with literal inline values rather
