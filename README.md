@@ -1,34 +1,45 @@
 # CorbinMeier.net
 
-The professional portfolio and business hub for Corbin Meier, a Digital Contractor specializing in high-performance digital infrastructure for local small businesses.
+Business site for Corbin Meier: one-time website builds for local businesses,
+plus monthly management of the DNS records that keep their email arriving and
+their site online.
 
 ## Architecture
 
-This site is built with **React 19 + Vite 6** and deployed to **Cloudflare Pages**.
-
-### Core Decision: Modern Cloud Architecture
-To maintain **no monthly infrastructure fees**, this project is architected to run entirely on modern cloud infrastructure without traditional server overhead.
-- **Dynamic Logic:** Contact form and interactions are handled by Cloudflare Functions.
-- **JSON-First Data:** Content is managed via structured JSON files in `src/data/`. This approach ensures information is easily updatable, version-trackable, and extremely fast.
-- **No Database:** No SQL/ORM layer is used. This keeps the site lightweight, secure, and focused on performance.
-- **API:** Contact form logic is handled via Cloudflare Pages Functions in `/functions`.
-
-## Redesign: The Artisan Engineer
-The site features a custom visual identity balancing high-end editorial typography (**Instrument Serif**) with blueprint-inspired engineering details.
+- **React 19 + Vite**, routing with React Router, pages in `src/pages/` and
+  routes declared in `src/App.tsx`.
+- **Cloudflare Pages** hosts the static build; Pages Functions in `functions/`
+  handle the contact form (`functions/api/send.ts`: Turnstile check, then email).
+- **JSON/TS content** in `src/data/`: copy, projects, pricing, FAQ. No database.
+- No monthly infrastructure cost on the Cloudflare free tier.
 
 ## Development
 
 ```bash
 npm install
-npm run dev
+npm run dev          # local dev server
+scripts/check.sh     # lint, typecheck, test, build - must end CHECK PASS
 ```
 
-### Building for Cloudflare
+Local secrets go in `.dev.vars` (gitignored); the keys are listed in
+`.dev.vars.example`. Script index: `scripts/README.md`.
 
-```bash
-npm run build
-npm run preview
-```
+## Deployment (Cloudflare Pages)
 
-## Strategy: Zero-Cost-to-Start
-I build growth-focused digital tools for local businesses without the high up-front overhead of traditional agencies or clunky DIY platforms.
+- Build command: `npm run build`
+- Output directory: `dist`
+- Compatibility flag: `nodejs_compat` (required by the email library in Functions)
+- Secrets (production and preview): `RESEND_API_KEY`, `TURNSTILE_SECRET_KEY`,
+  `PERSONAL_EMAIL`, via `npx wrangler pages secret put <KEY>`
+
+## Content notes
+
+- Project entries (`src/data/projects.json`) take an optional `links` array of
+  `{ label, url }`, shown in the project modal.
+- The homepage "Selected Works" shows three chosen projects, picked in
+  `src/components/FeaturedProjects.tsx`.
+- Project `date`/`year` match the first commit of each project's repository.
+
+## Design
+
+Visual rules: `docs/style_guide.md` ("The Steady Console").

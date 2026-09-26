@@ -55,3 +55,5 @@ docs/*.zip
 
 # project contract: local-only, repo is public
 CLAUDE.md
+# local-only legal drafts and reviews (repo is public)
+docs/legal/
