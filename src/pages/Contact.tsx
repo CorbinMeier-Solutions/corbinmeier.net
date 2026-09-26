@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { CloudflareTurnstile } from "@/components/CloudflareTurnstile";
 import { contact } from "@/data/contact";
 import { homeHero } from "@/data/home";
+import { turnstileSiteKey } from "@/data/turnstile";
 import type { ContactInfoItem } from "@/data/types";
 import { CyberCodeTerminalWindow, CyberCodeButton, Typewriter, CyberCodeTerminalLine } from "@/components/cybercode/CyberCodeUIKit";
 
@@ -17,9 +18,6 @@ const CONTACT_ICONS: Record<ContactInfoItem["icon"], LucideIcon> = {
   Mailbox,
   Clock,
 };
-
-// Official Cloudflare Turnstile "Always Passes" test key
-const TURNSTILE_SITE_KEY = import.meta.env.TURNSTILE_SITE_KEY || "1x00000000000000000000AA";
 
 export default function Contact() {
   const [searchParams] = useSearchParams();
@@ -362,27 +360,26 @@ export default function Contact() {
                   </div>
                 </div>
 
-                  {TURNSTILE_SITE_KEY && (
-                    <div className="hidden">
-                      <CloudflareTurnstile
-                        siteKey={TURNSTILE_SITE_KEY}
-                        onVerify={(token) => {
-                          setTurnstileToken(token);
-                          setTimeout(() => {
-                            setTurnstileStatus("verified");
-                          }, 5000);
-                        }}
-                        onError={() => {
-                          setTurnstileToken("");
-                          setTurnstileStatus("error");
-                        }}
-                        onExpire={() => {
-                          setTurnstileToken("");
-                          setTurnstileStatus("expired");
-                        }}
-                      />
-                    </div>
-                  )}
+                  {/* Never wrapped in display:none - the widget renders into an
+                      iframe and hangs indefinitely if its container is hidden.
+                      The invisible size keeps it out of the layout instead. */}
+                  <CloudflareTurnstile
+                    siteKey={turnstileSiteKey}
+                    onVerify={(token) => {
+                      setTurnstileToken(token);
+                      setTimeout(() => {
+                        setTurnstileStatus("verified");
+                      }, 5000);
+                    }}
+                    onError={() => {
+                      setTurnstileToken("");
+                      setTurnstileStatus("error");
+                    }}
+                    onExpire={() => {
+                      setTurnstileToken("");
+                      setTurnstileStatus("expired");
+                    }}
+                  />
 
                 {status && (
                   <motion.div

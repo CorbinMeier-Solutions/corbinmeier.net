@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { CloudflareTurnstile } from "@/components/CloudflareTurnstile";
 import { contact } from "@/data/contact";
 import { homeHero } from "@/data/home";
+import { turnstileSiteKey } from "@/data/turnstile";
 import type { ContactInfoItem } from "@/data/types";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { CyberCodeTerminalWindow, CyberCodeButton, CyberCodeTerminalLine, CyberCodeWindowChrome } from "@/components/cybercode/CyberCodeUIKit";
@@ -16,8 +17,6 @@ const CONTACT_ICONS: Record<ContactInfoItem["icon"], LucideIcon> = {
   Mailbox,
   Clock,
 };
-
-const TURNSTILE_SITE_KEY = import.meta.env.TURNSTILE_SITE_KEY || "1x00000000000000000000AA";
 
 export default function ContactModalProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -201,28 +200,29 @@ export default function ContactModalProvider({ children }: { children: ReactNode
     <ContactModalContext.Provider value={{ isOpen, open, close }}>
       {children}
 
-      {/* Persist Turnstile component outside of conditional rendering to keep token/status intact */}
-      {TURNSTILE_SITE_KEY && turnstileInitialized && (
-        <div className="hidden">
-          <CloudflareTurnstile
-            siteKey={TURNSTILE_SITE_KEY}
-            onVerify={(token) => {
-              setTurnstileToken(token);
-              // Small timeout to simulate synapscan
-              setTimeout(() => {
-                setTurnstileStatus("verified");
-              }, 1000);
-            }}
-            onError={() => {
-              setTurnstileToken("");
-              setTurnstileStatus("error");
-            }}
-            onExpire={() => {
-              setTurnstileToken("");
-              setTurnstileStatus("expired");
-            }}
-          />
-        </div>
+      {/* Persists outside the modal's conditional rendering so the token and
+          status survive a close/reopen. Never wrapped in display:none - the
+          widget renders into an iframe and hangs indefinitely if its container
+          is hidden; the invisible size keeps it out of the layout instead. */}
+      {turnstileInitialized && (
+        <CloudflareTurnstile
+          siteKey={turnstileSiteKey}
+          onVerify={(token) => {
+            setTurnstileToken(token);
+            // Small timeout to simulate synapscan
+            setTimeout(() => {
+              setTurnstileStatus("verified");
+            }, 1000);
+          }}
+          onError={() => {
+            setTurnstileToken("");
+            setTurnstileStatus("error");
+          }}
+          onExpire={() => {
+            setTurnstileToken("");
+            setTurnstileStatus("expired");
+          }}
+        />
       )}
 
       <AnimatePresence>
