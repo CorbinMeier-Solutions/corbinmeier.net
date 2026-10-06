@@ -53,7 +53,14 @@ dist/
 # local-only legal/business document bundles - not web code
 docs/*.zip
 
-# project contract: local-only, repo is public
-CLAUDE.md
 # local-only legal drafts and reviews (repo is public)
 docs/legal/
+
+# AI working files: local-only, repo is public
+CLAUDE.md
+.claude/
+.corbin/
+.impeccable/
+.project_map.txt
+.tags
+docs/web-enhancements-state.json
