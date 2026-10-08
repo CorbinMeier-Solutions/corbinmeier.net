@@ -35,10 +35,15 @@ variables are changed here rather than there.
 - Compatibility flag: `nodejs_compat` (required by the email library in Functions)
 - Plain variables: `wrangler.toml` `[vars]`, repeated in `[env.preview.vars]`
   because environments do not inherit them.
-- Secrets (production and preview): `RESEND_API_KEY` and `TURNSTILE_SECRET`,
+- Mail goes through Cloudflare Email Sending's REST API
+  (`functions/src/services/mail.ts`); Pages Functions cannot bind `send_email`.
+  The sender (`MAIL_FROM`), account (`CLOUDFLARE_ACCOUNT_ID`) and recipients
+  (`FORM_TO_ADDRESSES`) are `[vars]`.
+- Secrets (production and preview): `CLOUDFLARE_EMAIL_API_TOKEN` (an account
+  token with only the Email Sending: Send permission) and `TURNSTILE_SECRET`,
   via `npx wrangler pages secret put <KEY> --project-name corbinmeier-net`.
   Both are required: a missing one makes `functions/api/send.ts` return 500
-  rather than accept a submission it cannot verify.
+  rather than accept a submission it cannot send or verify.
 
 ## Content notes
 

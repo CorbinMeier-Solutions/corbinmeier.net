@@ -2,10 +2,12 @@ import React from "react";
 import { render } from "@react-email/render";
 import { EmailTemplate } from "../../src/components/EmailTemplateContactConfirmation";
 import { EmailTemplateOwnerNotification } from "../../src/components/EmailTemplateOwnerNotification";
-import { Resend } from "resend";
+import { EmailSendError, isValidEmail, parseRecipients, sendEmail } from "../src/services/mail";
 
 interface CloudflareEnv {
-  RESEND_API_KEY: string;
+  CLOUDFLARE_EMAIL_API_TOKEN: string;
+  CLOUDFLARE_ACCOUNT_ID: string;
+  MAIL_FROM: string;
   FORM_TO_ADDRESSES: string;
   TURNSTILE_SECRET: string;
 }
@@ -20,11 +22,23 @@ interface ContactRequestBody {
   turnstileToken?: string;
 }
 
+function logSendError(what: string, error: unknown): void {
+  if (error instanceof EmailSendError) {
+    console.error(
+      `Email Sending failed for ${what} (status ${error.status}, retryable=${error.retryable}): ${error.detail}`
+    );
+  } else {
+    console.error(`Sending ${what} failed:`, error);
+  }
+}
+
 export const onRequestPost: PagesFunction<CloudflareEnv> = async (context) => {
   const { request, env } = context;
 
-  if (!env.RESEND_API_KEY) {
-    console.error("RESEND_API_KEY is not defined in the environment.");
+  if (!env.CLOUDFLARE_EMAIL_API_TOKEN || !env.CLOUDFLARE_ACCOUNT_ID || !env.MAIL_FROM) {
+    console.error(
+      "CLOUDFLARE_EMAIL_API_TOKEN, CLOUDFLARE_ACCOUNT_ID or MAIL_FROM is not defined in the environment."
+    );
     return new Response(
       JSON.stringify({ error: "Email service is not configured." }),
       { status: 500, headers: { "Content-Type": "application/json" } }
@@ -45,6 +59,24 @@ export const onRequestPost: PagesFunction<CloudflareEnv> = async (context) => {
   try {
     const body = (await request.json()) as ContactRequestBody;
     const { turnstileToken } = body;
+
+    // Validation runs before Turnstile is spent: a malformed address would be
+    // rejected by the Email Sending API at send time (10202) anyway.
+    // Basic validation
+    if (!body.firstName || !body.email || !body.subject) {
+      return new Response(
+        JSON.stringify({ error: "Please provide firstName, email and subject." }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    if (!isValidEmail(body.email.trim())) {
+      return new Response(
+        JSON.stringify({ error: "Please enter a valid email address." }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+    const visitorEmail = body.email.trim();
 
     // Turnstile verification
     if (!turnstileToken) {
@@ -74,16 +106,6 @@ export const onRequestPost: PagesFunction<CloudflareEnv> = async (context) => {
       );
     }
 
-    const resend = new Resend(env.RESEND_API_KEY);
-
-    // Basic validation
-    if (!body.firstName || !body.email || !body.subject) {
-      return new Response(
-        JSON.stringify({ error: "Please provide firstName, email and subject." }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
     // Render email template
     const emailHtml = await render(
       React.createElement(EmailTemplate, {
@@ -104,28 +126,9 @@ ${body.subject ? `Subject: ${body.subject}\n\n` : ""}I appreciate you reaching o
 
 ${body.message ? `Message preview:\n${body.message}\n\n` : ""}- Corbin`;
 
-    // Send confirmation email to the visitor
-    const confirmationPromise = resend.emails.send({
-      from: "Corbin Meier <contact@corbinmeier.net>",
-      to: [body.email],
-      subject: "Contact Confirmation",
-      html: emailHtml,
-      text: textContent,
-      headers: {
-        "List-Unsubscribe": "<mailto:contact@corbinmeier.net?subject=unsubscribe>",
-      },
-    });
-
-    // Send notification to site owner. FORM_TO_ADDRESSES is comma-separated by
-    // contract, so it is parsed into a list rather than passed as one string.
-    // One send per recipient, so a single bad address cannot block the others,
-    // belongs with the move off Resend (#17).
-    const formToAddresses = (env.FORM_TO_ADDRESSES || "")
-      .split(",")
-      .map((address) => address.trim())
-      .filter(Boolean);
-
-    if (formToAddresses.length === 0) {
+    // FORM_TO_ADDRESSES is comma-separated by contract.
+    const recipients = parseRecipients(env.FORM_TO_ADDRESSES || "");
+    if (recipients.length === 0) {
       console.error("FORM_TO_ADDRESSES is not defined in the environment.");
     }
 
@@ -148,35 +151,54 @@ ${body.message ? `Message preview:\n${body.message}\n\n` : ""}- Corbin`;
       body.subject || ""
     }\n\nMessage:\n${body.message || "(no message)"}`;
 
-    const ownerNotificationPromise = resend.emails.send({
-      from: "corbinmeier.net <contact@corbinmeier.net>",
-      to: formToAddresses.length > 0 ? formToAddresses : ["contact@corbinmeier.net"],
-      replyTo: body.email,
-      subject: `New contact: ${body.subject}`,
-      html: ownerHtml,
-      text: ownerText,
-    });
+    const fullName = [body.firstName, body.lastName].filter(Boolean).join(" ");
 
-    const [confRes, ownerRes] = await Promise.all([
-      confirmationPromise,
-      ownerNotificationPromise,
-    ]);
+    // One send per recipient, not one send carrying every recipient: a single
+    // bad address cannot block the others. Success is "at least one delivered".
+    let ownerDelivered = false;
+    for (const recipient of recipients) {
+      try {
+        const result = await sendEmail(env, {
+          to: recipient,
+          from: env.MAIL_FROM,
+          reply_to: { address: visitorEmail, name: fullName || undefined },
+          subject: `New contact: ${body.subject}`,
+          html: ownerHtml,
+          text: ownerText,
+        });
+        if (result.permanent_bounces.length > 0) {
+          console.error(`Permanent bounce sending the contact notification to ${recipient}`);
+        } else {
+          ownerDelivered = true;
+        }
+      } catch (error) {
+        logSendError(`contact notification to ${recipient}`, error);
+      }
+    }
 
-    if (confRes.error || ownerRes.error) {
-      console.error("Email sending failed:", {
-        confirmation: confRes.error,
-        owner: ownerRes.error,
-      });
+    if (!ownerDelivered) {
       return new Response(
-        JSON.stringify({ 
-          error: "Failed to send one or more emails.",
-          details: {
-            visitor: confRes.error ? "Failed" : "Sent",
-            owner: ownerRes.error ? "Failed" : "Sent"
-          }
-        }),
+        JSON.stringify({ error: "We couldn't send your message just now. Please try again." }),
         { status: 500, headers: { "Content-Type": "application/json" } }
       );
+    }
+
+    // The visitor's confirmation is a courtesy: the enquiry already reached
+    // the owner, so a failure here is logged, not shown.
+    try {
+      const result = await sendEmail(env, {
+        to: visitorEmail,
+        from: env.MAIL_FROM,
+        reply_to: recipients[0],
+        subject: "Contact Confirmation",
+        html: emailHtml,
+        text: textContent,
+      });
+      if (result.permanent_bounces.length > 0) {
+        console.error(`Permanent bounce sending the confirmation to ${visitorEmail}`);
+      }
+    } catch (error) {
+      logSendError("visitor confirmation", error);
     }
 
     return new Response(JSON.stringify({ ok: true }), {
