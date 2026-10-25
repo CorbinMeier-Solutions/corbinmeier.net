@@ -183,7 +183,7 @@ ${body.message ? `Message preview:\n${body.message}\n\n` : ""}- Corbin`;
       );
     }
 
-    // The visitor's confirmation is a courtesy: the enquiry already reached
+    // The visitor's confirmation is a courtesy: the inquiry already reached
     // the owner, so a failure here is logged, not shown.
     try {
       const result = await sendEmail(env, {

@@ -216,7 +216,7 @@ export const pricing: PricingContent = {
           prerequisites: [],
           level: 2,
           responsibility:
-            "Multi-step forms that ask the right follow-up questions and can return a live estimate, so the enquiries reaching you are already qualified.",
+            "Multi-step forms that ask the right follow-up questions and can return a live estimate, so the inquiries reaching you are already qualified.",
         },
         {
           id: "local-seo",
