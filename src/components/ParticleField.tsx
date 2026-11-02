@@ -20,7 +20,8 @@ import {
  */
 
 const MAX_DPR = 1.5;
-const NARROW_WIDTH = 640;
+/* standard: responsive-views - the tablet edge; below it is the phone view */
+const NARROW_WIDTH = 720;
 const REDUCE_FACTOR = 1 / 3;
 
 const RING_COUNT = 300;
