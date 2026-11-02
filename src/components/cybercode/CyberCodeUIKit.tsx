@@ -63,7 +63,7 @@ function accentVars(accent: CyberAccent): CSSProperties {
 /* Global keyframes - mount once near the app root                          */
 /* ------------------------------------------------------------------------ */
 
-/** Injects the @keyframes used by glitch/blink/float utilities below. Mount once, e.g. in App.tsx. */
+/** Injects the @keyframes used by glitch/blink/float utilities below. Mount once, e.g. in root.tsx. */
 export function CyberCodeStyles() {
   return (
     <style>{`
