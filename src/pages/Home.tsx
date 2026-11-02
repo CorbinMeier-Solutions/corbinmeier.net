@@ -8,8 +8,8 @@ import PageShell from "@/components/PageShell";
 
 export function meta() {
   return pageMeta({
-    title: "Corbin Meier | Software Engineer",
-    description: "Software Engineer specializing in building sophisticated, high-performance applications.",
+    title: "Custom websites, built right. | Corbin Meier",
+    description: "I design and build custom, high-performance websites for local businesses - quoted fairly to fit your project and budget.",
     path: "/",
   });
 }
