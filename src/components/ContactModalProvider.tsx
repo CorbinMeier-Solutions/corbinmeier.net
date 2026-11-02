@@ -1,4 +1,4 @@
-import React, { useState, ReactNode, useEffect } from "react";
+import React, { useState, ReactNode, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, MapPin, Clock, Mailbox, Save, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -41,17 +41,22 @@ export default function ContactModalProvider({ children }: { children: ReactNode
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [submitted, setSubmitted] = useState(false);
 
-  const open = (options?: { subject?: string }) => {
-    if (options?.subject !== undefined) {
-      setForm((f) => ({ ...f, subject: options.subject || "" }));
-    }
-    setIsOpen(true);
-    turnstile.reset();
-  };
+  // Stable identities: consumers (ContactRedirect's effect) depend on `open`, and
+  // reset() sets state, so a new `open` per render re-fires them in an endless loop.
+  const resetTurnstile = turnstile.reset;
+  const open = useCallback(
+    (options?: { subject?: string }) => {
+      if (options?.subject !== undefined) {
+        setForm((f) => ({ ...f, subject: options.subject || "" }));
+      }
+      setIsOpen(true);
+      resetTurnstile();
+    },
+    [resetTurnstile],
+  );
 
-  const close = () => {
-    setIsOpen(false);
-  };
+  const close = useCallback(() => setIsOpen(false), []);
+  const contextValue = useMemo(() => ({ isOpen, open, close }), [isOpen, open, close]);
 
   // Intercept all clicks to "/contact" globally
   useEffect(() => {
@@ -77,7 +82,7 @@ export default function ContactModalProvider({ children }: { children: ReactNode
     };
     document.addEventListener("click", handleClick, true);
     return () => document.removeEventListener("click", handleClick, true);
-  }, []);
+  }, [open]);
 
   // Listen to escape key to close contact modal
   useEffect(() => {
@@ -88,7 +93,7 @@ export default function ContactModalProvider({ children }: { children: ReactNode
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen]);
+  }, [isOpen, close]);
 
   function getValidationError(field: "firstName" | "email" | "phone" | "subject" | "message") {
     if (!touched[field] && !submitted) return null;
@@ -183,7 +188,7 @@ export default function ContactModalProvider({ children }: { children: ReactNode
   }
 
   return (
-    <ContactModalContext.Provider value={{ isOpen, open, close }}>
+    <ContactModalContext.Provider value={contextValue}>
       {children}
 
       <AnimatePresence>
