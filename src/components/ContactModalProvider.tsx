@@ -1,11 +1,13 @@
 import React, { useState, ReactNode, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, MapPin, Clock, Mailbox, Save, Bot, type LucideIcon } from "lucide-react";
+import { Mail, MapPin, Clock, Mailbox, Save, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CloudflareTurnstile } from "@/components/CloudflareTurnstile";
+import TurnstileFailureNotice from "@/components/TurnstileFailureNotice";
+import TurnstileStatusIcon from "@/components/TurnstileStatusIcon";
+import { useTurnstile } from "@/components/useTurnstile";
 import { contact } from "@/data/contact";
 import { homeHero } from "@/data/home";
-import { turnstileSiteKey } from "@/data/turnstile";
 import type { ContactInfoItem } from "@/data/types";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { CyberCodeTerminalWindow, CyberCodeButton, CyberCodeTerminalLine, CyberCodeWindowChrome } from "@/components/cybercode/CyberCodeUIKit";
@@ -33,20 +35,18 @@ export default function ContactModalProvider({ children }: { children: ReactNode
     message: "",
   });
 
-  const [turnstileToken, setTurnstileToken] = useState<string>("");
-  const [turnstileStatus, setTurnstileStatus] = useState<"verifying" | "verified" | "expired" | "error">("verifying");
+  const turnstile = useTurnstile();
   const [status, setStatus] = useState<null | { ok: boolean; message: string }>(null);
   const [loading, setLoading] = useState(false);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [submitted, setSubmitted] = useState(false);
-  const [turnstileInitialized, setTurnstileInitialized] = useState(false);
 
   const open = (options?: { subject?: string }) => {
     if (options?.subject !== undefined) {
       setForm((f) => ({ ...f, subject: options.subject || "" }));
     }
     setIsOpen(true);
-    setTurnstileInitialized(true);
+    turnstile.reset();
   };
 
   const close = () => {
@@ -132,26 +132,14 @@ export default function ContactModalProvider({ children }: { children: ReactNode
       return;
     }
 
-    if (!turnstileToken) {
-      // "verified" is absent by design: reaching here means no token was issued.
-      const messages: Partial<Record<typeof turnstileStatus, string>> = {
-        verifying: "Security check is running. Please wait...",
-        error: "Security verification failed. Please refresh the page and try again.",
-        expired: "Security verification expired. Please refresh the page.",
-      };
-      setStatus({
-        ok: false,
-        message: messages[turnstileStatus] || contact.validation.missingTurnstile,
-      });
-      return;
-    }
+    if (turnstile.status !== "verified") return;
 
     setLoading(true);
     try {
       const res = await fetch("/api/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, turnstileToken }),
+        body: JSON.stringify({ ...form, turnstileToken: turnstile.token }),
       });
 
       const responseText = await res.text();
@@ -184,14 +172,12 @@ export default function ContactModalProvider({ children }: { children: ReactNode
         });
         setTouched({});
         setSubmitted(false);
-        // Reset turnstile status on successful submit so they re-verify next time
-        setTurnstileToken("");
-        setTurnstileStatus("verifying");
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       setStatus({ ok: false, message: msg || "Unknown error" });
     } finally {
+      turnstile.reset();
       setLoading(false);
     }
   }
@@ -199,31 +185,6 @@ export default function ContactModalProvider({ children }: { children: ReactNode
   return (
     <ContactModalContext.Provider value={{ isOpen, open, close }}>
       {children}
-
-      {/* Persists outside the modal's conditional rendering so the token and
-          status survive a close/reopen. Never wrapped in display:none - the
-          widget renders into an iframe and hangs indefinitely if its container
-          is hidden; the invisible size keeps it out of the layout instead. */}
-      {turnstileInitialized && (
-        <CloudflareTurnstile
-          siteKey={turnstileSiteKey}
-          onVerify={(token) => {
-            setTurnstileToken(token);
-            // Small timeout to simulate synapscan
-            setTimeout(() => {
-              setTurnstileStatus("verified");
-            }, 1000);
-          }}
-          onError={() => {
-            setTurnstileToken("");
-            setTurnstileStatus("error");
-          }}
-          onExpire={() => {
-            setTurnstileToken("");
-            setTurnstileStatus("expired");
-          }}
-        />
-      )}
 
       <AnimatePresence>
         {isOpen && (
@@ -404,7 +365,7 @@ export default function ContactModalProvider({ children }: { children: ReactNode
                         <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
                           <CyberCodeButton
                             type="submit"
-                            disabled={loading || turnstileStatus === "verifying"}
+                            disabled={loading || turnstile.status !== "verified"}
                             className="w-full sm:w-auto font-mono text-xs py-1.5 px-4 disabled:opacity-60 flex items-center justify-center gap-2"
                           >
                             {loading ? (
@@ -415,11 +376,6 @@ export default function ContactModalProvider({ children }: { children: ReactNode
                                 />
                                 <span>Transmitting...</span>
                               </>
-                            ) : turnstileStatus === "verifying" ? (
-                              <>
-                                <Bot className="w-4 h-4 text-[var(--accent)] animate-bounce" />
-                                <span>Scanning synapses...</span>
-                              </>
                             ) : (
                               <>
                                 <Save className="w-4 h-4 text-[var(--accent)]" />
@@ -428,25 +384,11 @@ export default function ContactModalProvider({ children }: { children: ReactNode
                             )}
                           </CyberCodeButton>
 
-                          <div className="flex items-center gap-2 text-xs font-mono select-none">
-                            <span className={cn(
-                              "w-2 h-2 rounded-full",
-                              turnstileStatus === "verified" && "bg-emerald-500 animate-pulse",
-                              turnstileStatus === "verifying" && "bg-amber-500 animate-ping",
-                              (turnstileStatus === "error" || turnstileStatus === "expired") && "bg-rose-500 animate-pulse"
-                            )} />
-                            <span className={cn(
-                              turnstileStatus === "verified" && "text-emerald-500",
-                              turnstileStatus === "verifying" && "text-amber-500",
-                              (turnstileStatus === "error" || turnstileStatus === "expired") && "text-rose-500"
-                            )}>
-                              {turnstileStatus === "verifying" && "[human_check: pending...]"}
-                              {turnstileStatus === "verified" && "[human_check: verified]"}
-                              {turnstileStatus === "expired" && "[human_check: expired]"}
-                              {turnstileStatus === "error" && "[human_check: failed]"}
-                            </span>
-                          </div>
+                          <TurnstileStatusIcon status={turnstile.status} />
                         </div>
+
+                        <CloudflareTurnstile key={turnstile.widgetKey} action="send" {...turnstile.widgetProps} />
+                        <TurnstileFailureNotice status={turnstile.status} onRetry={turnstile.retry} />
 
                         {status && (
                           <motion.div
