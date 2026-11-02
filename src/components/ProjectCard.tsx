@@ -139,9 +139,9 @@ export default function ProjectCard({
         </div>
 
         <div className="flex-1 pt-6 flex flex-col">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-2 mb-4">
             <span className="text-[10px] font-mono text-accent font-bold uppercase tracking-[0.2em]">{project.date || project.year}</span>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2 min-w-0">
               {project.skills?.slice(0, 3).map(skill => (
                 <span key={skill} className="px-2.5 py-1 rounded-md bg-muted/5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground border border-border/50">
                   {skill}
