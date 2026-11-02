@@ -15,6 +15,17 @@ describe("parseContactForm", () => {
     expect(parseContactForm({ ...valid, subject: "" }).ok).toBe(false);
     expect(parseContactForm(null).ok).toBe(false);
   });
+  it("names missing fields in plain words, never as identifiers", () => {
+    const errors = [
+      parseContactForm(null),
+      parseContactForm({ ...valid, subject: "" }),
+      parseContactForm({ ...valid, firstName: "" }),
+      parseContactForm({ ...valid, email: "not-an-email" }),
+      parseContactForm({ ...valid, subject: "a\nb" }),
+    ].map((result) => (result.ok ? "" : result.error));
+    expect(errors[1]).toBe("Please enter your first name, email and subject.");
+    for (const error of errors) expect(error).not.toMatch(/[a-z][A-Z]/);
+  });
   it("rejects bad dots in the email", () => {
     expect(parseContactForm({ ...valid, email: "a..b@example.com" }).ok).toBe(false);
   });

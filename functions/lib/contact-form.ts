@@ -14,6 +14,7 @@ export type ParsedContact =
   | { ok: false; error: string };
 
 const FIELDS = ["firstName", "lastName", "email", "phone", "subject", "message"] as const;
+export const MISSING_FIELDS_ERROR = "Please enter your first name, email and subject.";
 const HEADER_BREAK = /[\r\n]/;
 
 /** Reads one submitted field as a trimmed string; anything else becomes "". */
@@ -28,7 +29,7 @@ function field(raw: Record<string, unknown>, key: string): string {
  */
 export function parseContactForm(raw: unknown): ParsedContact {
   if (typeof raw !== "object" || raw === null) {
-    return { ok: false, error: "Please provide firstName, email and subject." };
+    return { ok: false, error: MISSING_FIELDS_ERROR };
   }
   const record = raw as Record<string, unknown>;
   const form = Object.fromEntries(FIELDS.map((key) => [key, field(record, key)])) as unknown as ContactForm;
@@ -40,7 +41,7 @@ export function parseContactForm(raw: unknown): ParsedContact {
     }
   }
   if (!form.firstName || !form.email || !form.subject) {
-    return { ok: false, error: "Please provide firstName, email and subject." };
+    return { ok: false, error: MISSING_FIELDS_ERROR };
   }
   if (!isValidEmail(form.email)) {
     return { ok: false, error: "Please enter a valid email address." };
