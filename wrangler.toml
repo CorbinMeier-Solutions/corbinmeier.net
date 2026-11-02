@@ -20,6 +20,8 @@ MAIL_FROM = "Corbin Meier <contact@send.corbinmeier.net>"
 FORM_TO_ADDRESSES = "corbinmeier.solutions@gmail.com"
 # added 2026-09-26
 BUSINESS_TIMEZONE = "America/Los_Angeles"
+# added 2026-11-01
+KEY_ALERT_GITHUB_REPO = "CorbinMeier-Solutions/corbinmeier.net"
 
 # Preview always notifies the developer, never the owner: preview traffic is testing.
 [env.preview.vars]
@@ -31,3 +33,5 @@ MAIL_FROM = "Corbin Meier <contact@send.corbinmeier.net>"
 FORM_TO_ADDRESSES = "corbinmeier.solutions@gmail.com"
 # added 2026-09-26
 BUSINESS_TIMEZONE = "America/Los_Angeles"
+# added 2026-11-01
+KEY_ALERT_GITHUB_REPO = "CorbinMeier-Solutions/corbinmeier.net"

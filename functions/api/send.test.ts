@@ -76,6 +76,38 @@ describe("POST /api/send", () => {
     expect(log.mock.calls[0][0]).toContain("MAIL_FROM");
   });
 
+  it("files a key-failure issue when Email Sending rejects the token, and the visitor sees only the generic error", async () => {
+    const calls: { url: string; body: string }[] = [];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string, init?: { body?: string }) => {
+        calls.push({ url, body: String(init?.body ?? "") });
+        if (url.includes("siteverify")) return new Response(JSON.stringify({ success: true, action: "send" }));
+        if (url.includes("email/sending"))
+          return new Response(JSON.stringify({ success: false, errors: [{ code: 10101, message: "Invalid token" }] }), {
+            status: 403,
+          });
+        if (url.includes("/issues?")) return new Response("[]");
+        return new Response("{}", { status: 201 });
+      })
+    );
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const pending: Promise<unknown>[] = [];
+    const request = new Request("https://example.com/api/send", { method: "POST", body: JSON.stringify(body) });
+    const context = {
+      request,
+      env: { ...env, KEY_ALERT_GITHUB_PAT: "pat-placeholder", KEY_ALERT_GITHUB_REPO: "owner/repo" },
+      waitUntil: (p: Promise<unknown>) => pending.push(p),
+    };
+    const response = await onRequestPost(context as unknown as Parameters<typeof onRequestPost>[0]);
+    await Promise.all(pending);
+    expect(response.status).toBe(500);
+    expect(await response.text()).not.toContain("10101");
+    const filed = calls.find((c) => c.url.endsWith("/repos/owner/repo/issues"));
+    expect(filed?.body).toContain("CLOUDFLARE_EMAIL_API_TOKEN");
+    expect(filed?.body).not.toContain("token-placeholder");
+  });
+
   it("returns the generic error when the provider rejects every recipient", async () => {
     stubFetch({ success: true, action: "send" }, () => new Response("{}", { status: 500 }));
     vi.spyOn(console, "error").mockImplementation(() => {});
