@@ -2,7 +2,6 @@ import type {
   AnchorHTMLAttributes,
   ButtonHTMLAttributes,
   CSSProperties,
-  ElementType,
   InputHTMLAttributes,
   ReactNode,
   TextareaHTMLAttributes,
@@ -63,12 +62,10 @@ function accentVars(accent: CyberAccent): CSSProperties {
 /* Global keyframes - mount once near the app root                          */
 /* ------------------------------------------------------------------------ */
 
-/** Injects the @keyframes used by glitch/blink/float utilities below. Mount once, e.g. in root.tsx. */
+/** Injects the @keyframes used by blink/float utilities below. Mount once, e.g. in root.tsx. */
 export function CyberCodeStyles() {
   return (
     <style>{`
-      @keyframes cc-glitch-skew { 0%,100%{transform:skew(0)} 20%{transform:skew(0)} 21%{transform:skew(1deg)} 22%{transform:skew(0)} }
-      @keyframes cc-glitch-slice-a { 0%{transform:translate(0)} 20%{transform:translate(-3px,3px)} 40%{transform:translate(-3px,-3px)} 60%{transform:translate(3px,3px)} 80%{transform:translate(3px,-3px)} 100%{transform:translate(0)} }
       @keyframes cc-blink { 0%,100%{opacity:1} 50%{opacity:0} }
       @keyframes cc-float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
       @keyframes cc-code-drift { 0%{transform:translate3d(-8%,20px,0);opacity:0} 18%,82%{opacity:1} 100%{transform:translate3d(18%,-70px,0);opacity:0} }
@@ -229,41 +226,6 @@ export function CyberCodeBlinkCursor({ accent = "primary", className }: { accent
 }
 
 /* ------------------------------------------------------------------------ */
-/* Glitch heading                                                           */
-/* ------------------------------------------------------------------------ */
-
-export function CyberCodeGlitchHeading({
-  as = "h2",
-  children,
-  accent = "primary",
-  className,
-}: {
-  as?: "h1" | "h2" | "h3";
-  children: ReactNode;
-  accent?: CyberAccent;
-  className?: string;
-}) {
-  const As = as as ElementType;
-  return (
-    <As
-      className={cx(
-        "relative inline-block font-black text-foreground [animation:cc-glitch-skew_4s_infinite_linear_alternate-reverse]",
-        className
-      )}
-      style={accentVars(accent)}
-    >
-      {children}
-      <span
-        aria-hidden="true"
-        className="absolute inset-0 text-[var(--cc-text)] opacity-70 [animation:cc-glitch-slice-a_3s_infinite_linear_alternate-reverse] [clip-path:polygon(0_0,100%_0,100%_35%,0_35%)]"
-      >
-        {children}
-      </span>
-    </As>
-  );
-}
-
-/* ------------------------------------------------------------------------ */
 /* Code editor block - tabs + line numbers + code content                   */
 /* ------------------------------------------------------------------------ */
 
@@ -339,7 +301,7 @@ export function CyberCodeStatCard({
   return (
     <div
       className={cx(
-        "flex min-h-[150px] flex-col items-center justify-center rounded-xl border border-border bg-white/5 p-6 text-center transition-transform hover:-translate-y-1",
+        "flex min-h-[150px] flex-col items-center justify-center rounded-xl border border-border bg-card p-6 text-center transition-transform hover:-translate-y-1",
         className
       )}
       style={accentVars(accent)}
@@ -415,7 +377,7 @@ export function CyberCodeProjectCard({
   return (
     <article
       className={cx(
-        "overflow-hidden rounded-xl border border-border bg-white/5 transition-all hover:-translate-y-2",
+        "overflow-hidden rounded-xl border border-border bg-card transition-all hover:-translate-y-2",
         className
       )}
       style={accentVars(accent)}
