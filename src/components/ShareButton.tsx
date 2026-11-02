@@ -87,7 +87,7 @@ export default function ShareButton() {
         <div
           role="group"
           aria-label="Share this page"
-          className="absolute bottom-full left-0 z-20 mb-2 w-52 max-w-[calc(100vw-2rem)] rounded-xl border border-border bg-background p-2 shadow-lg"
+          className="absolute bottom-full right-0 tablet:left-0 tablet:right-auto z-20 mb-2 w-52 max-w-[calc(100vw-2rem)] rounded-xl border border-border bg-background p-2 shadow-lg"
         >
           {links.map(({ platform, label, href }) => {
             const Icon = ICONS[platform];
