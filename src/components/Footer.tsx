@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Mail } from "lucide-react";
 import { IconBrandGithub, IconBrandLinkedin } from "@tabler/icons-react";
 import { site } from "@/data/site";
+import ShareButton from "@/components/ShareButton";
 import { CyberCodeSocialLink } from "@/components/cybercode/CyberCodeUIKit";
 
 export default function Footer() {
@@ -24,6 +25,7 @@ export default function Footer() {
               <CyberCodeSocialLink href={site.footerSocial.github} target="_blank" rel="noopener noreferrer" icon={<IconBrandGithub className="w-5 h-5" />} label="GitHub" />
               <CyberCodeSocialLink href={site.footerSocial.linkedin} target="_blank" rel="noopener noreferrer" icon={<IconBrandLinkedin className="w-5 h-5" />} label="LinkedIn" />
               <CyberCodeSocialLink href={site.footerSocial.email} icon={<Mail className="w-5 h-5" />} label="Email" />
+              <ShareButton />
             </div>
           </div>
 
