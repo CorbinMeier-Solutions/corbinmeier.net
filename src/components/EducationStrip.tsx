@@ -6,6 +6,11 @@ import { GraduationCap, Terminal } from "lucide-react";
 import { motion } from "framer-motion";
 import { CyberCodeTerminalWindow } from "@/components/cybercode/CyberCodeUIKit";
 
+// The local diploma file arrives later (config task); until it exists in
+// public/images the preview is omitted instead of requesting a missing file.
+const hasDiplomaPreview =
+  Object.keys(import.meta.glob("/public/images/diploma-preview.jpg")).length > 0;
+
 export default function EducationStrip() {
   const butte = associates.find((a) => a.name.toLowerCase().includes("butte"));
   if (!butte) return null;
@@ -56,12 +61,16 @@ export default function EducationStrip() {
                 aria-label="View official diploma on Parchment.com"
                 title="Official diploma (opens in new tab)"
               >
-                <img
-                  src={education.diplomaPreviewUrl}
-                  alt="Diploma preview"
-                  className="absolute inset-0 w-full h-full object-cover"
-                  loading="lazy"
-                />
+                {hasDiplomaPreview && (
+                  <img
+                    src={education.diplomaPreviewPath}
+                    alt="Diploma preview"
+                    width={160}
+                    height={112}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                )}
                 <div className="absolute inset-0 bg-accent/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <span className="text-white text-xs font-bold uppercase">{education.diplomaOverlayLabel}</span>
                 </div>

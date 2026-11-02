@@ -153,7 +153,7 @@ export interface EducationContent {
   eyebrow: string;
   degreeTitle: string;
   diplomaUrl: string;
-  diplomaPreviewUrl: string;
+  diplomaPreviewPath: string;
   diplomaOverlayLabel: string;
 }
 
