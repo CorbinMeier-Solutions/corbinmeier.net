@@ -2,3 +2,14 @@ https://:project.pages.dev/*
   X-Robots-Tag: noindex
 https://:version.:project.pages.dev/*
   X-Robots-Tag: noindex
+
+# llms-txt: every page points at /llms.txt; build/client/_headers also gets a per-page
+# rel="alternate" Markdown Link block from scripts/build-llms.mjs.
+/*
+  Link: </llms.txt>; rel="describedby"
+
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
+
+/*.md
+  Content-Type: text/markdown; charset=utf-8
