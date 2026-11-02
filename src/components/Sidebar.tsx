@@ -1,6 +1,7 @@
 "use client";
 
-import { Link, useLocation } from "react-router";
+import { Link } from "react-router";
+import { useRoutePath } from "@/hooks/useRoutePath";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { FileCode2, Home, Save, Wrench } from "lucide-react";
@@ -12,7 +13,7 @@ import { bellEase } from "@/lib/theme";
 const ICONS = [Home, FileCode2, Wrench, Wrench];
 
 export default function Sidebar() {
-  const { pathname } = useLocation();
+  const pathname = useRoutePath();
   const items = [{ name: "Home", href: "/" }, ...site.navItems];
   const activeColor = useAnimatedAccent(pathname);
 

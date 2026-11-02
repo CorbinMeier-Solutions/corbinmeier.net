@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router";
+import { Link } from "react-router";
+import { useRoutePath } from "@/hooks/useRoutePath";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Home, FileCode2, FolderOpen, Save, Wrench } from "lucide-react";
@@ -13,7 +14,7 @@ import { bellEase } from "@/lib/theme";
 const ICONS = [Home, FileCode2, Wrench, Wrench];
 
 export default function Header() {
-  const { pathname } = useLocation();
+  const pathname = useRoutePath();
   const [menuOpen, setMenuOpen] = useState(false);
   const items = [{ name: "Home", href: "/" }, ...site.navItems];
   const activeColor = useAnimatedAccent(pathname);
