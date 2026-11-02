@@ -1,3 +1,4 @@
+# standard: robots-txt@2026-10-26
 User-agent: *
 Allow: /
 
