@@ -8,6 +8,7 @@
 | `check-faq-sources.mjs` | Verifies every citation link in `src/data/faqs.json` resolves and flags hosts outside source tiers 1-2 | `npm run check:sources` | a clean report, exit 0 |
 | `check-turnstile-key.mjs` | Fails the production Pages build (main) when `src/data/turnstile.ts` has no real `0x` site key; warns elsewhere | runs first in `npm run build` | silent with a real key |
 | `finish-build.sh` | Post-build step: `404/index.html` to `404.html`, flattens `<route>/index.html` to `<route>.html`, generates `sitemap.xml` from each page's canonical (and `robots.txt` when `public/robots.txt` is absent) | runs inside `npm run build` | `FINISH PASS` |
+| `build-llms.mjs` | Post-build step: writes `llms.txt` and a Markdown version of each indexable page from the prerendered HTML, appends per-page `Link` headers, fails the build on an invalid `llms.txt` | runs inside `npm run build`, after `finish-build.sh` | `LLMS PASS (<n> pages)` |
 | `site-url.mjs` | Build guard: prints the production `SITE_URL` origin from `wrangler.toml` `[vars]`, fails on a missing or invalid value | `node scripts/site-url.mjs` | the origin, exit 0 |
 | `sync-project-images.mjs` | Syncs project images before `dev` and `build` (runs as `predev`/`prebuild`) | automatic | no output on success |
 | `one-off/` | Single-use scripts, named `YYYY-MM-DD-<slug>.sh`, kept as the record | - | - |
