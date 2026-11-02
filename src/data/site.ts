@@ -1,5 +1,8 @@
 import type { SiteContent } from "./types";
 
+/** Canonical production origin: shared and canonical URLs never use the current (possibly preview) host. */
+export const SITE_ORIGIN = "https://corbinmeier.net";
+
 export const site: SiteContent = {
   brandName: "Corbin Meier",
   navItems: [
