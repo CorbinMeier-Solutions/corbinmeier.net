@@ -30,7 +30,7 @@ function levelLabel(level: number | undefined, legend: PricingLevelInfo[]) {
 /** Level legend, rendered once above every category's table. */
 function LevelLegend({ legend }: { legend: PricingLevelInfo[] }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+    <div className="grid grid-cols-1 tablet:grid-cols-3 gap-4 mb-10">
       {legend.map((entry) => (
         <div key={entry.level} className="rounded-xl border border-border bg-card p-4">
           <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent mb-1">

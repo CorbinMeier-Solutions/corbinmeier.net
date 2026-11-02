@@ -32,7 +32,7 @@ export default function FeaturedProjects() {
 
   return (
     <section className="section-container border-b border-border/50">
-      <div className="mb-10 sm:mb-20">
+      <div className="mb-10 tablet:mb-20">
         <div className="flex justify-between items-baseline mb-6 gap-8">
           <h2 className="text-h2 font-serif">Selected Works</h2>
           <CyberCodeLinkButton
@@ -54,7 +54,7 @@ export default function FeaturedProjects() {
         initial="hidden"
         whileInView="show"
         viewport={{ once: true, margin: "-100px" }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        className="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-8"
       >
         {featured.map((p) => (
           <motion.div key={p.slug} variants={item}>

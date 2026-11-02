@@ -49,18 +49,18 @@ export default function CrtNotFound({
       <div className={`crt-noise-${uid} pointer-events-none absolute inset-0 z-0 opacity-[0.04]`} />
       <div className={`crt-scan-${uid} pointer-events-none absolute inset-0 z-10`} />
 
-      <div className="relative z-20 mx-auto max-w-2xl px-8 py-16 sm:px-16">
-        <h1 className="text-3xl sm:text-4xl">
+      <div className="relative z-20 mx-auto max-w-2xl px-8 py-16 tablet:px-16">
+        <h1 className="text-3xl tablet:text-4xl">
           {title} <span className="text-white">{errorCode}</span>
         </h1>
 
         {lines.map((line, i) => (
-          <p key={i} className="crt-output mt-4 text-base sm:text-lg" style={{ color: palette.fg }}>
+          <p key={i} className="crt-output mt-4 text-base tablet:text-lg" style={{ color: palette.fg }}>
             {line}
           </p>
         ))}
 
-        <p className="crt-output mt-4 text-base sm:text-lg" style={{ color: palette.fg }}>
+        <p className="crt-output mt-4 text-base tablet:text-lg" style={{ color: palette.fg }}>
           Please try to{" "}
           <a href={backHref} className="crt-link text-white no-underline">
             {backLabel}

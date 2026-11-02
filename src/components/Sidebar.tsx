@@ -17,7 +17,7 @@ export default function Sidebar() {
   const activeColor = useAnimatedAccent(pathname);
 
   return (
-    <aside className="hidden lg:flex fixed top-0 left-0 bottom-0 z-40 w-60 flex-col border-r border-border bg-background">
+    <aside className="hidden desktop:flex fixed top-0 left-0 bottom-0 z-40 w-60 flex-col border-r border-border bg-background">
       <Link to="/" className="flex items-center gap-3 px-6 py-6 border-b border-border group">
         <div className="relative w-9 h-9 overflow-hidden rounded-full border border-border transition-transform group-hover:scale-105">
           <img

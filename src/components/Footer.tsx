@@ -13,8 +13,8 @@ export default function Footer() {
   return (
     <footer className="border-t border-border mt-10">
       <div className="section-container">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-          <div className="md:col-span-2">
+        <div className="grid grid-cols-1 tablet:grid-cols-4 gap-12">
+          <div className="tablet:col-span-2">
             <Link to="/" className="font-serif text-2xl tracking-tight mb-6 block">
               {site.brandName}
             </Link>

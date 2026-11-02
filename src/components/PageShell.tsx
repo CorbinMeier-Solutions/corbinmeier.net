@@ -22,5 +22,5 @@ export default function PageShell({
 }) {
   useThemeTransition(theme);
 
-  return <div className={cn("relative min-h-screen pt-16 lg:pt-6 pb-10", className)}>{children}</div>;
+  return <div className={cn("relative min-h-screen pt-16 desktop:pt-6 pb-10", className)}>{children}</div>;
 }

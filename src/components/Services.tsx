@@ -54,7 +54,7 @@ export default function Services() {
         icon={<Terminal className="w-3 h-3" />}
         showDots={false}
       >
-        <div className="w-full mb-10 sm:mb-16 text-center sm:text-left">
+        <div className="w-full mb-10 tablet:mb-16 text-center tablet:text-left">
           <h2 className="text-h2 font-serif mb-6">{servicesSection.headingPre} <span className="text-accent italic">{servicesSection.headingAccent}</span></h2>
           <p className="text-narrative">
             {servicesSection.intro}
@@ -66,7 +66,7 @@ export default function Services() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-4 gap-6"
         >
           {servicesSection.items.map((s) => {
             const Icon = ICONS[s.icon];

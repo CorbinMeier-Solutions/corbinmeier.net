@@ -46,7 +46,7 @@ export default function Pricing() {
         {/* Maintenance axis: offered against every package, so it renders once
             here rather than being repeated inside each package's row. */}
         <PageSection heading={pricing.maintenanceHeading} lead={pricing.maintenanceIntro}>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+          <div className="grid grid-cols-1 desktop:grid-cols-2 gap-6 items-stretch">
             {pricing.maintenanceOptions.map((option) => (
               <div
                 key={option.id}
@@ -92,7 +92,7 @@ export default function Pricing() {
 
         {/* Notices */}
         <PageSection heading={pricing.noticesHeading}>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-6">
             {pricing.notices.map((notice) => (
               <div key={notice.title} className="glass-panel p-6">
                 <h3 className="font-serif text-lg mb-3 text-accent">{notice.title}</h3>

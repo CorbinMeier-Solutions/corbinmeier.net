@@ -50,16 +50,16 @@ function FaqLogEntry({ entry, categorySlug }: { entry: FaqEntry; categorySlug: s
           className={cn("w-3.5 h-3.5 shrink-0 text-muted transition-transform duration-200", open && "rotate-90 text-accent")}
         />
         <FileText className={cn("w-4 h-4 shrink-0", open ? "text-accent" : "text-accent/70")} />
-        <span className="text-muted/70 hidden sm:inline">{categorySlug}/</span>
+        <span className="text-muted/70 hidden tablet:inline">{categorySlug}/</span>
         <span className="font-bold text-foreground">{filename}</span>
-        <span className="hidden md:inline text-muted truncate flex-1">{entry.question}</span>
+        <span className="hidden tablet:inline text-muted truncate flex-1">{entry.question}</span>
         <span className="ml-auto flex items-center gap-3 shrink-0 pl-3 text-[10px] uppercase tracking-widest">
           {entry.tag && (
             <span className="px-2 py-0.5 rounded bg-accent/15 text-accent font-bold border border-accent/20">
               {entry.tag}
             </span>
           )}
-          {entry.date && <span className="hidden sm:inline text-muted/60">{entry.date}</span>}
+          {entry.date && <span className="hidden tablet:inline text-muted/60">{entry.date}</span>}
         </span>
       </button>
 
@@ -73,7 +73,7 @@ function FaqLogEntry({ entry, categorySlug }: { entry: FaqEntry; categorySlug: s
             className="overflow-hidden"
           >
             <div className="px-4 pb-6 pl-11 space-y-4 border-l border-accent/20 ml-[1.15rem]">
-              <p className="pt-2 font-mono text-sm font-bold text-foreground md:hidden">
+              <p className="pt-2 font-mono text-sm font-bold text-foreground tablet:hidden">
                 {entry.question}
               </p>
 

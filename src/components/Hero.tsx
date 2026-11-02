@@ -27,7 +27,7 @@ export default function Hero() {
   };
 
   return (
-    <section className="w-full px-6 sm:px-10 pt-0 lg:pt-0 pb-12 sm:pb-16 flex flex-col justify-start items-start relative">
+    <section className="w-full px-6 tablet:px-10 pt-0 desktop:pt-0 pb-12 tablet:pb-16 flex flex-col justify-start items-start relative">
       <motion.div
         variants={container}
         initial="hidden"

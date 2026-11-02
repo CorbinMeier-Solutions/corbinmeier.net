@@ -184,7 +184,7 @@ export function CyberCodeParticleField({
 /** Ring + soft trailing dot that follow the pointer, replacing the OS cursor. Hidden on touch/coarse pointers. */
 export function CyberCodeCustomCursor({
   color = "#3b82f6",
-  className = "hidden md:block",
+  className = "hidden tablet:block",
 }: {
   color?: string;
   className?: string;

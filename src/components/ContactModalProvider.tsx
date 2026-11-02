@@ -188,7 +188,7 @@ export default function ContactModalProvider({ children }: { children: ReactNode
 
       <AnimatePresence>
         {isOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 lg:p-8">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 tablet:p-6 desktop:p-8">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -210,16 +210,16 @@ export default function ContactModalProvider({ children }: { children: ReactNode
                 onDotClick={close}
               />
 
-              <div className="flex-1 overflow-y-auto p-6 sm:p-8">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+              <div className="flex-1 overflow-y-auto p-6 tablet:p-8">
+                <div className="grid grid-cols-1 desktop:grid-cols-12 gap-8 desktop:gap-12">
                   {/* Info Panel */}
-                  <div className="lg:col-span-5 flex flex-col justify-between">
+                  <div className="desktop:col-span-5 flex flex-col justify-between">
                     <div>
                       <header className="mb-8">
                         <CyberCodeTerminalLine prompt=">" className="mb-2">
                           <span className="font-mono text-sm">mailto contact@corbinmeier.net</span>
                         </CyberCodeTerminalLine>
-                        <h2 className="text-2xl sm:text-3xl font-serif mb-4">
+                        <h2 className="text-2xl tablet:text-3xl font-serif mb-4">
                           {contact.heading}
                         </h2>
                         {form.subject.toLowerCase() === "strategic partnership" ? (
@@ -267,15 +267,15 @@ export default function ContactModalProvider({ children }: { children: ReactNode
                   </div>
 
                   {/* Form Panel */}
-                  <div className="lg:col-span-7">
+                  <div className="desktop:col-span-7">
                     <CyberCodeTerminalWindow
                       title="visitor@meier.net:~/contact_form"
                       accent="primary"
                       className="!bg-[var(--background)] !border-[var(--border)]"
-                      bodyClassName="p-4 sm:p-6"
+                      bodyClassName="p-4 tablet:p-6"
                     >
                       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 tablet:grid-cols-2 gap-4">
                           <div className="flex flex-col gap-1 py-1">
                             <label className={cn(
                               "font-mono text-xs select-none transition-colors",
@@ -302,7 +302,7 @@ export default function ContactModalProvider({ children }: { children: ReactNode
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 tablet:grid-cols-2 gap-4">
                           <div className="flex flex-col gap-1 py-1">
                             <label className={cn(
                               "font-mono text-xs select-none transition-colors",
@@ -362,11 +362,11 @@ export default function ContactModalProvider({ children }: { children: ReactNode
                           />
                         </div>
 
-                        <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
+                        <div className="pt-2 flex flex-col tablet:flex-row tablet:items-center justify-between gap-4 w-full">
                           <CyberCodeButton
                             type="submit"
                             disabled={loading || turnstile.status !== "verified"}
-                            className="w-full sm:w-auto font-mono text-xs py-1.5 px-4 disabled:opacity-60 flex items-center justify-center gap-2"
+                            className="w-full tablet:w-auto font-mono text-xs py-1.5 px-4 disabled:opacity-60 flex items-center justify-center gap-2"
                           >
                             {loading ? (
                               <>

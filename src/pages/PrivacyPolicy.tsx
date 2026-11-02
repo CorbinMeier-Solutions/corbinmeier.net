@@ -38,7 +38,7 @@ export default function PrivacyPolicy() {
         animate="show"
         className="page-container"
       >
-        <motion.header variants={item} className="w-full mb-16 text-center sm:text-left">
+        <motion.header variants={item} className="w-full mb-16 text-center tablet:text-left">
           <h1 className="text-h1 font-serif mb-6">Privacy Policy</h1>
           <p className="text-narrative">Last updated: {LAST_UPDATED}</p>
           <p className="text-sm text-muted mt-2">

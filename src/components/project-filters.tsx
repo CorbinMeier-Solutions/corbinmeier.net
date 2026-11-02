@@ -59,7 +59,7 @@ export default function ProjectFilters({
         showDots={false}
         className="w-full"
       >
-        <div className="flex flex-col md:flex-row gap-4 items-center -m-2">
+        <div className="flex flex-col tablet:flex-row gap-4 items-center -m-2">
           <div className="relative flex-1 w-full">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
             <input
@@ -78,7 +78,7 @@ export default function ProjectFilters({
             )}
           </div>
 
-          <div className="flex flex-wrap gap-2 w-full md:w-auto justify-start md:justify-end">
+          <div className="flex flex-wrap gap-2 w-full tablet:w-auto justify-start tablet:justify-end">
             <div className="relative group">
               <select
                 value={year}
@@ -138,7 +138,7 @@ export default function ProjectFilters({
       </CyberCodeTerminalWindow>
 
       {/* Result count */}
-      <p className="text-xs font-bold uppercase tracking-widest text-muted text-center sm:text-left">
+      <p className="text-xs font-bold uppercase tracking-widest text-muted text-center tablet:text-left">
         Showing {filtered.length} of {projects.length}{" "}
         {projects.length === 1 ? "project" : "projects"}
       </p>
@@ -146,7 +146,7 @@ export default function ProjectFilters({
       {/* Grid */}
       <motion.div
         layout
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        className="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-8"
       >
         <AnimatePresence mode="popLayout">
           {filtered.map((p) => (

@@ -38,7 +38,7 @@ function EntryImageModal({
   if (!image) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 tablet:p-6 desktop:p-8">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -52,14 +52,14 @@ function EntryImageModal({
           <button
             onClick={(e) => { e.stopPropagation(); onNavigate(-1); }}
             aria-label="Previous image"
-            className="hidden sm:flex absolute left-2 xl:left-6 top-1/2 -translate-y-1/2 z-10 p-3 bg-background/60 hover:bg-background/90 border border-white/10 rounded-full transition-all items-center justify-center"
+            className="hidden tablet:flex absolute left-2 desktop:left-6 top-1/2 -translate-y-1/2 z-10 p-3 bg-background/60 hover:bg-background/90 border border-white/10 rounded-full transition-all items-center justify-center"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); onNavigate(1); }}
             aria-label="Next image"
-            className="hidden sm:flex absolute right-2 xl:right-6 top-1/2 -translate-y-1/2 z-10 p-3 bg-background/60 hover:bg-background/90 border border-white/10 rounded-full transition-all items-center justify-center"
+            className="hidden tablet:flex absolute right-2 desktop:right-6 top-1/2 -translate-y-1/2 z-10 p-3 bg-background/60 hover:bg-background/90 border border-white/10 rounded-full transition-all items-center justify-center"
           >
             <ChevronRight className="w-6 h-6" />
           </button>
@@ -91,7 +91,7 @@ function EntryImageModal({
             </button>
           </div>
 
-          <div className="p-4 sm:p-6 space-y-2">
+          <div className="p-4 tablet:p-6 space-y-2">
             {image.label && (
               <h3 className="font-mono font-bold text-foreground uppercase tracking-wider text-sm">
                 {image.label}
@@ -168,7 +168,7 @@ function WorkshopEntryCard({ entry }: { entry: WorkshopEntry }) {
             <tbody>
               {images.map((img, idx) => (
                 <tr key={img.src} className={idx > 0 ? "border-t border-border/30" : undefined}>
-                  <td className="w-48 sm:w-56 p-2 align-middle">
+                  <td className="w-48 tablet:w-56 p-2 align-middle">
                     <button
                       type="button"
                       onClick={() => setActiveImageIndex(idx)}

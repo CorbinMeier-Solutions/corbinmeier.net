@@ -22,9 +22,9 @@ export default function EducationStrip() {
           icon={<Terminal className="w-3 h-3" />}
           showDots={true}
         >
-          <div className="flex flex-col sm:flex-row items-center gap-8">
+          <div className="flex flex-col tablet:flex-row items-center gap-8">
             <div className="flex-shrink-0">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 relative bg-white rounded-full border border-border overflow-hidden m-0.5 p-px">
+              <div className="w-20 h-20 tablet:w-24 tablet:h-24 relative bg-white rounded-full border border-border overflow-hidden m-0.5 p-px">
                 <img
                   src={butte.logo}
                   alt={`${butte.name} logo`}
@@ -34,7 +34,7 @@ export default function EducationStrip() {
               </div>
             </div>
 
-            <div className="flex-1 text-center sm:text-left">
+            <div className="flex-1 text-center tablet:text-left">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-bold uppercase tracking-wider mb-3">
                 <GraduationCap className="w-3 h-3" />
                 {education.eyebrow}
@@ -52,7 +52,7 @@ export default function EducationStrip() {
                 href={education.diplomaUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative block w-32 h-24 sm:w-40 sm:h-28 rounded-xl overflow-hidden border border-border transition-transform hover:scale-105"
+                className="group relative block w-32 h-24 tablet:w-40 tablet:h-28 rounded-xl overflow-hidden border border-border transition-transform hover:scale-105"
                 aria-label="View official diploma on Parchment.com"
                 title="Official diploma (opens in new tab)"
               >

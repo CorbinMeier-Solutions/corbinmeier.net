@@ -112,7 +112,7 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
       {children}
       <AnimatePresence>
         {isOpen && project && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 lg:p-8">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 tablet:p-6 desktop:p-8">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -126,14 +126,14 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
                 <button
                   onClick={(e) => { e.stopPropagation(); navigateProject(-1); }}
                   aria-label="Previous project"
-                  className="hidden lg:flex absolute left-2 xl:left-6 top-1/2 -translate-y-1/2 z-10 p-3 bg-background/60 hover:bg-background/90 border border-white/10 rounded-full transition-all items-center justify-center"
+                  className="hidden desktop:flex absolute left-2 desktop:left-6 top-1/2 -translate-y-1/2 z-10 p-3 bg-background/60 hover:bg-background/90 border border-white/10 rounded-full transition-all items-center justify-center"
                 >
                   <ChevronLeft className="w-6 h-6" />
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); navigateProject(1); }}
                   aria-label="Next project"
-                  className="hidden lg:flex absolute right-2 xl:right-6 top-1/2 -translate-y-1/2 z-10 p-3 bg-background/60 hover:bg-background/90 border border-white/10 rounded-full transition-all items-center justify-center"
+                  className="hidden desktop:flex absolute right-2 desktop:right-6 top-1/2 -translate-y-1/2 z-10 p-3 bg-background/60 hover:bg-background/90 border border-white/10 rounded-full transition-all items-center justify-center"
                 >
                   <ChevronRight className="w-6 h-6" />
                 </button>
@@ -156,7 +156,7 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
               />
 
               {hasProjectNav && (
-                <div className="flex lg:hidden items-center justify-between border-b border-border bg-white/5 px-4 py-2">
+                <div className="flex desktop:hidden items-center justify-between border-b border-border bg-white/5 px-4 py-2">
                   <button
                     onClick={() => navigateProject(-1)}
                     className="flex items-center gap-1 text-xs font-mono text-muted hover:text-accent transition-colors"
@@ -177,10 +177,10 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
                 </div>
               )}
 
-              <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
+              <div className="flex-1 flex flex-col tablet:flex-row overflow-hidden min-h-0">
                 {/* Image Section */}
-                <div className="shrink-0 md:shrink md:w-3/5 min-h-0 bg-muted/20 relative overflow-hidden flex flex-col border-b md:border-b-0 md:border-r border-border">
-                  <div className="aspect-video max-h-[40dvh] md:aspect-auto md:max-h-none md:flex-1 md:min-h-0 relative overflow-hidden group">
+                <div className="shrink-0 tablet:shrink tablet:w-3/5 min-h-0 bg-muted/20 relative overflow-hidden flex flex-col border-b tablet:border-b-0 tablet:border-r border-border">
+                  <div className="aspect-video max-h-[40dvh] tablet:aspect-auto tablet:max-h-none tablet:flex-1 tablet:min-h-0 relative overflow-hidden group">
                     <AnimatePresence initial={false} custom={direction}>
                       <motion.div
                         key={activeIndex}
@@ -320,7 +320,7 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
                 </div>
 
                 {/* Content Section */}
-                <div className="md:w-2/5 min-h-0 p-[6px] overflow-y-auto flex flex-col">
+                <div className="tablet:w-2/5 min-h-0 p-[6px] overflow-y-auto flex flex-col">
                   <div className="space-y-4 flex-1">
                       <CyberCodeTerminalWindow title="details.data" showDots={false}>
                         <div className="font-mono text-sm space-y-2">
@@ -479,7 +479,7 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-black/95 flex items-center justify-center p-4 md:p-12 overflow-hidden"
+            className="fixed inset-0 z-[200] bg-black/95 flex items-center justify-center p-4 tablet:p-12 overflow-hidden"
             onClick={() => setIsFullscreen(false)}
           >
             <motion.div 

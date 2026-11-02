@@ -19,11 +19,11 @@ export default function CTA() {
           icon={<Terminal className="w-3 h-3" />}
           showDots={true}
         >
-          <div className="py-12 sm:py-16 text-center max-w-2xl mx-auto">
+          <div className="py-12 tablet:py-16 text-center max-w-2xl mx-auto">
             <h2 className="text-h2 font-serif mb-8">
               {homeCta.headingPre} <span className="text-accent italic">{homeCta.headingAccent}</span>
             </h2>
-            <p className="text-muted text-lg sm:text-xl mb-12 leading-relaxed">
+            <p className="text-muted text-lg tablet:text-xl mb-12 leading-relaxed">
               {homeCta.body}
             </p>
             <div className="flex justify-center">

@@ -55,8 +55,8 @@ export default function About() {
           </p>
         </motion.header>
 
-        <div className="flex flex-col lg:flex-row gap-12 items-start">
-          <motion.div variants={item} className="w-full lg:w-[384px] lg:sticky lg:top-16 flex-none mx-auto lg:mx-0">
+        <div className="flex flex-col desktop:flex-row gap-12 items-start">
+          <motion.div variants={item} className="w-full desktop:w-[384px] desktop:sticky desktop:top-16 flex-none mx-auto desktop:mx-0">
             <CyberCodeTerminalWindow title="corbin.jpg" icon={<Terminal className="w-3 h-3" />} collapsible>
               <div className="relative aspect-square -m-6 overflow-hidden">
                 <img

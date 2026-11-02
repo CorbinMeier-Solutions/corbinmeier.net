@@ -22,7 +22,7 @@ interface DataTableProps<T> {
 export default function DataTable<T>({ columns, rows, rowKey, className }: DataTableProps<T>) {
   return (
     <div className={cn("w-full", className)}>
-      <div className="hidden sm:block rounded-xl border border-border overflow-hidden">
+      <div className="hidden tablet:block rounded-xl border border-border overflow-hidden">
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="bg-card">
@@ -53,7 +53,7 @@ export default function DataTable<T>({ columns, rows, rowKey, className }: DataT
         </table>
       </div>
 
-      <div className="sm:hidden flex flex-col gap-4">
+      <div className="tablet:hidden flex flex-col gap-4">
         {rows.map((row) => (
           <div key={rowKey(row)} className="rounded-xl border border-border bg-card p-4 flex flex-col gap-3">
             {columns.map((col) => (

@@ -1,6 +1,10 @@
 @import "tailwindcss";
 
 @theme {
+  /* standard: responsive-views@2026-09-29 */
+  --breakpoint-*: initial;
+  --breakpoint-tablet: 720px;
+  --breakpoint-desktop: 940px;
   /* "Geist Variable" is the family the self-hosted @fontsource-variable package
      registers; plain "Geist" stays behind it for anyone who has the static face
      installed locally. */
@@ -105,19 +109,19 @@ html.theme-contact, html.theme-contact body {
      headings stay consistent across every page. .text-display is reserved
      for the homepage hero only. */
   .text-display {
-    @apply text-3xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-tight;
+    @apply text-3xl tablet:text-5xl desktop:text-6xl leading-[1.05] tracking-tight;
   }
 
   .text-h1 {
-    @apply text-3xl sm:text-4xl leading-tight tracking-tight;
+    @apply text-3xl tablet:text-4xl leading-tight tracking-tight;
   }
 
   .text-h2 {
-    @apply text-2xl sm:text-3xl leading-tight tracking-tight;
+    @apply text-2xl tablet:text-3xl leading-tight tracking-tight;
   }
 
   .text-h3 {
-    @apply text-lg sm:text-xl font-medium leading-snug;
+    @apply text-lg tablet:text-xl font-medium leading-snug;
   }
 
   .glass-panel {
@@ -150,7 +154,7 @@ html.theme-contact, html.theme-contact body {
      than invented fresh. Extend this list before reaching for an ad hoc
      margin/padding/gap value. */
   .section-container {
-    @apply w-full px-6 sm:px-10 py-10 sm:py-16;
+    @apply w-full px-6 tablet:px-10 py-10 tablet:py-16;
   }
 
   /* Horizontal-only variant of .section-container - for a page's single
@@ -159,7 +163,7 @@ html.theme-contact, html.theme-contact body {
      vertical padding on top of it and push content down further than
      intended. */
   .page-container {
-    @apply w-full px-6 sm:px-10;
+    @apply w-full px-6 tablet:px-10;
   }
 
   /* Header-to-content gap: the space below a page's <header> (eyebrow + h1 +
@@ -180,7 +184,7 @@ html.theme-contact, html.theme-contact body {
   }
 
   .text-narrative {
-    @apply text-lg sm:text-2xl text-muted font-light leading-[1.4] w-full;
+    @apply text-lg tablet:text-2xl text-muted font-light leading-[1.4] w-full;
   }
 
   .btn-artisan {

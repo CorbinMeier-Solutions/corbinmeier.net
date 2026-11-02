@@ -9,7 +9,7 @@ export default function SiteLayout() {
     <>
       <Header />
       <Sidebar />
-      <div className="lg:pl-60">
+      <div className="desktop:pl-60">
         <ProjectModalProvider>
           <div className="content-wrapper">
             <Outlet />

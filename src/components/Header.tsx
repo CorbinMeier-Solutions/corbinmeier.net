@@ -37,7 +37,7 @@ export default function Header() {
   }, [menuOpen]);
 
   return (
-    <header className="lg:hidden fixed top-0 left-0 right-0 z-50 px-6 py-4">
+    <header className="desktop:hidden fixed top-0 left-0 right-0 z-50 px-6 py-4">
       <div className="max-w-7xl mx-auto flex justify-end">
         <button
           type="button"
