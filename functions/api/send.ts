@@ -1,9 +1,8 @@
-import React from "react";
-import { render } from "@react-email/render";
-import { EmailTemplate } from "../../src/components/EmailTemplateContactConfirmation";
-import { EmailTemplateOwnerNotification } from "../../src/components/EmailTemplateOwnerNotification";
+// standard: contact-form@2026-10-16
+import { renderConfirmationEmail, renderOwnerEmail } from "../lib/contact-emails";
+import { buildReplyTo, parseContactForm } from "../lib/contact-form";
 import { EmailSendError, parseRecipients, sendEmail } from "../lib/send-email";
-import { isValidEmail } from "../lib/validation";
+import { jsonResponse, rejectUnverified } from "../lib/turnstile";
 
 interface CloudflareEnv {
   CLOUDFLARE_EMAIL_API_TOKEN: string;
@@ -13,189 +12,82 @@ interface CloudflareEnv {
   TURNSTILE_SECRET: string;
 }
 
-interface ContactRequestBody {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  phone?: string;
-  subject?: string;
-  message?: string;
-  turnstileToken?: string;
+const TURNSTILE_ACTION = "send";
+const GENERIC_ERROR = "Error submitting message, please try again later.";
+
+function logEvent(event: string, fields: Record<string, unknown> = {}): void {
+  console.error(JSON.stringify({ event, ...fields }));
 }
 
-function logSendError(what: string, error: unknown): void {
-  if (error instanceof EmailSendError) {
-    console.error(
-      `Email Sending failed for ${what} (status ${error.status}, retryable=${error.retryable}): ${error.detail}`
-    );
-  } else {
-    console.error(`Sending ${what} failed:`, error);
-  }
+function missingConfig(env: Partial<CloudflareEnv>): string[] {
+  const required = [
+    "CLOUDFLARE_EMAIL_API_TOKEN",
+    "CLOUDFLARE_ACCOUNT_ID",
+    "MAIL_FROM",
+    "FORM_TO_ADDRESSES",
+    "TURNSTILE_SECRET",
+  ] as const;
+  return required.filter((key) => !env[key]);
 }
 
-export const onRequestPost: PagesFunction<CloudflareEnv> = async (context) => {
-  const { request, env } = context;
-
-  if (!env.CLOUDFLARE_EMAIL_API_TOKEN || !env.CLOUDFLARE_ACCOUNT_ID || !env.MAIL_FROM) {
-    console.error(
-      "CLOUDFLARE_EMAIL_API_TOKEN, CLOUDFLARE_ACCOUNT_ID or MAIL_FROM is not defined in the environment."
-    );
-    return new Response(
-      JSON.stringify({ error: "Email service is not configured." }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
-  }
-
-  // Refuse rather than skip. Gating verification on the secret's own presence
-  // meant an absent or renamed binding silently turned the bot check off while
-  // the form carried on accepting submissions.
-  if (!env.TURNSTILE_SECRET) {
-    console.error("TURNSTILE_SECRET is not defined in the environment.");
-    return new Response(
-      JSON.stringify({ error: "The contact form is unavailable right now." }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
-  }
-
+export const onRequestPost: PagesFunction<CloudflareEnv> = async ({ request, env }) => {
   try {
-    const body = (await request.json()) as ContactRequestBody;
-    const { turnstileToken } = body;
-
-    // Validation runs before Turnstile is spent: a malformed address would be
-    // rejected by the Email Sending API at send time (10202) anyway.
-    // Basic validation
-    if (!body.firstName || !body.email || !body.subject) {
-      return new Response(
-        JSON.stringify({ error: "Please provide firstName, email and subject." }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+    // 1. Turnstile, before anything else. Fails closed without its secret.
+    if (!env.TURNSTILE_SECRET) {
+      logEvent("config_missing", { missing: ["TURNSTILE_SECRET"] });
+      return jsonResponse({ error: GENERIC_ERROR }, 500);
     }
+    const raw: unknown = await request.json();
+    const token =
+      typeof raw === "object" && raw !== null && "turnstileToken" in raw && typeof raw.turnstileToken === "string"
+        ? raw.turnstileToken
+        : "";
+    const rejection = await rejectUnverified(request, env.TURNSTILE_SECRET, token, TURNSTILE_ACTION);
+    if (rejection) return rejection;
 
-    if (!isValidEmail(body.email.trim())) {
-      return new Response(
-        JSON.stringify({ error: "Please enter a valid email address." }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+    // 2. Field validation. Header injection: parseContactForm rejects [\r\n] in every single-line field.
+    const parsed = parseContactForm(raw);
+    if (!parsed.ok) return jsonResponse({ error: parsed.error }, 400);
+    const { form } = parsed;
+
+    // 3. Configuration check: names go to the log, never to the visitor.
+    const missing = missingConfig(env);
+    if (missing.length > 0) {
+      logEvent("config_missing", { missing });
+      return jsonResponse({ error: GENERIC_ERROR }, 500);
     }
-    const visitorEmail = body.email.trim();
+    const recipients = parseRecipients(env.FORM_TO_ADDRESSES);
 
-    // Turnstile verification
-    if (!turnstileToken) {
-      return new Response(
-        JSON.stringify({ error: "Security check token missing." }),
-        { status: 403, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    const formData = new FormData();
-    formData.append("secret", env.TURNSTILE_SECRET);
-    formData.append("response", turnstileToken);
-    const ip = request.headers.get("CF-Connecting-IP");
-    if (ip) formData.append("remoteip", ip);
-
-    const url = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
-    const result = await fetch(url, {
-      body: formData,
-      method: "POST",
+    // 4. Send. The owner's notification must land; the visitor's confirmation is a courtesy.
+    const owner = await renderOwnerEmail(form);
+    await sendEmail(env, {
+      to: recipients,
+      from: env.MAIL_FROM,
+      replyTo: buildReplyTo(form),
+      subject: owner.subject,
+      html: owner.html,
+      text: owner.text,
     });
 
-    const outcome = (await result.json()) as { success: boolean };
-    if (!outcome.success) {
-      return new Response(
-        JSON.stringify({ error: "Security check failed. Please try again." }),
-        { status: 403, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // Render email template
-    const emailHtml = await render(
-      React.createElement(EmailTemplate, {
-        firstName: body.firstName || "",
-        lastName: body.lastName || "",
-        phone: body.phone || undefined,
-        subject: body.subject || "",
-        messagePreview: body.message || undefined,
-      })
-    );
-
-    // Confirmation email text fallback
-    const textContent = `Thanks for contacting me, ${
-      [body.firstName, body.lastName].filter(Boolean).join(" ") || ""
-    }.
-    
-${body.subject ? `Subject: ${body.subject}\n\n` : ""}I appreciate you reaching out. This is a confirmation that I received your message - I will review it and get back to you as soon as possible.
-
-${body.message ? `Message preview:\n${body.message}\n\n` : ""}- Corbin`;
-
-    // FORM_TO_ADDRESSES is comma-separated by contract.
-    const recipients = parseRecipients(env.FORM_TO_ADDRESSES || "");
-    if (recipients.length === 0) {
-      console.error("FORM_TO_ADDRESSES is not defined in the environment.");
-    }
-
-    // Both parts, from the same fields: a text-only client renders nothing from
-    // an HTML-only send, and an HTML-only send scores worse with spam filters.
-    const ownerHtml = await render(
-      React.createElement(EmailTemplateOwnerNotification, {
-        firstName: body.firstName || undefined,
-        lastName: body.lastName || undefined,
-        email: body.email || "",
-        phone: body.phone || undefined,
-        subject: body.subject || undefined,
-        message: body.message || undefined,
-      })
-    );
-
-    const ownerText = `New contact submission:\n\nName: ${body.firstName || ""} ${
-      body.lastName || ""
-    }\nEmail: ${body.email}\nPhone: ${body.phone || ""}\nSubject: ${
-      body.subject || ""
-    }\n\nMessage:\n${body.message || "(no message)"}`;
-
-    const fullName = [body.firstName, body.lastName].filter(Boolean).join(" ");
-
     try {
+      const confirmation = await renderConfirmationEmail(form);
       await sendEmail(env, {
-        to: recipients,
-        from: env.MAIL_FROM,
-        replyTo: fullName ? `"${fullName.replace(/"/g, "'")}" <${visitorEmail}>` : visitorEmail,
-        subject: `New contact: ${body.subject}`,
-        html: ownerHtml,
-        text: ownerText,
-      });
-    } catch (error) {
-      logSendError("contact notification", error);
-      return new Response(
-        JSON.stringify({ error: "We couldn't send your message just now. Please try again." }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // The visitor's confirmation is a courtesy: the inquiry already reached
-    // the owner, so a failure here is logged, not shown.
-    try {
-      await sendEmail(env, {
-        to: visitorEmail,
+        to: form.email,
         from: env.MAIL_FROM,
         replyTo: recipients[0],
-        subject: "Contact Confirmation",
-        html: emailHtml,
-        text: textContent,
+        subject: confirmation.subject,
+        html: confirmation.html,
+        text: confirmation.text,
       });
     } catch (error) {
-      logSendError("visitor confirmation", error);
+      logEvent("confirmation_failed", { cause: error instanceof Error ? error.message : "unknown" });
     }
 
-    return new Response(JSON.stringify({ ok: true }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonResponse({ ok: true }, 200);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Internal Server Error";
-    console.error("API Error:", error);
-    return new Response(
-      JSON.stringify({ error: message }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    logEvent("send_failed", {
+      cause: error instanceof EmailSendError ? `status ${error.status}: ${error.detail}` : String(error),
+    });
+    return jsonResponse({ error: GENERIC_ERROR }, 500);
   }
 };
