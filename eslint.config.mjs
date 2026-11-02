@@ -46,7 +46,7 @@ export default tseslint.config(
 
   // Build/tooling scripts that run under Node.
   {
-    files: ["scripts/**/*.mjs", "*.config.{ts,mjs}"],
+    files: ["scripts/**/*.{mjs,ts}", "*.config.{ts,mjs}"],
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     languageOptions: {
       ecmaVersion: 2022,

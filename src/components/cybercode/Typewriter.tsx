@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useHydrated } from "@/hooks/useHydrated";
 
 // React 19 types element props as `unknown`, so narrow to the only shape we read.
 type WithChildren = { children?: React.ReactNode };
@@ -99,6 +100,7 @@ export default function Typewriter({
   className,
   showCursor = true,
 }: TypewriterProps) {
+  const hydrated = useHydrated();
   const totalChars = countTextCharacters(children);
   const [visibleCharCount, setVisibleCharCount] = useState(0);
   const [started, setStarted] = useState(false);
@@ -121,7 +123,8 @@ export default function Typewriter({
   }, []);
 
   useEffect(() => {
-    if (reducedMotion) return;
+    // The element only carries the ref once hydrated, so observe from then on.
+    if (reducedMotion || !hydrated) return;
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
@@ -138,7 +141,7 @@ export default function Typewriter({
     }
 
     return () => observer.disconnect();
-  }, [delayMs, reducedMotion]);
+  }, [delayMs, reducedMotion, hydrated]);
 
   useEffect(() => {
     if (reducedMotion || !started || totalChars <= 0) return;
@@ -168,6 +171,16 @@ export default function Typewriter({
       return () => clearTimeout(timer);
     }
   }, [visibleCharCount, totalChars, showCursor]);
+
+  // Server HTML and the hydration render match for every visitor: the full
+  // text (so crawlers read it) held invisible until the reveal can run.
+  if (!hydrated) {
+    return (
+      <Component className={className} style={{ opacity: 0 }}>
+        {children}
+      </Component>
+    );
+  }
 
   if (reducedMotion) {
     return <Component className={className}>{children}</Component>;

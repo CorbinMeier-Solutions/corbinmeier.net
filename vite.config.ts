@@ -1,14 +1,15 @@
-/// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
+import { readSiteUrl } from './scripts/site-url.mjs';
 
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
   ],
+  define: { __SITE_URL__: JSON.stringify(readSiteUrl()) },
   envPrefix: ['VITE_', 'TURNSTILE_'],
   resolve: {
     alias: {
@@ -26,10 +27,5 @@ export default defineConfig({
     // color-mix()/oklch()/@property, which no downlevelling can reproduce, and
     // aiming esbuild lower only risks rewriting CSS it cannot actually fix.
     cssTarget: 'safari16',
-  },
-  test: {
-    environment: 'jsdom',
-    include: ['src/**/*.test.{ts,tsx}', 'functions/**/*.test.ts'],
-    setupFiles: ['src/test-setup.ts'],
   },
 });
