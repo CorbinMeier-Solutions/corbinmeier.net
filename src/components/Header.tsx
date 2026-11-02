@@ -62,7 +62,7 @@ export default function Header() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={() => setMenuOpen(false)}
-              className="fixed inset-0 bg-background/60 backdrop-blur-sm z-40"
+              className="fixed inset-0 bg-background/60 z-40"
             />
             <motion.aside
               id="mobile-nav-menu"

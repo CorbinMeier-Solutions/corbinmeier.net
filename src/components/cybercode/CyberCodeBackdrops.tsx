@@ -1,88 +1,12 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Full-viewport decorative backdrops for the CyberCode UI Kit: a matrix-rain
- * canvas, a linked-particle field, and a custom cursor. Each is self-managed
+ * Full-viewport decorative backdrops for the CyberCode UI Kit: a
+ * linked-particle field and a custom cursor. Each is self-managed
  * (mounts its own canvas, cleans up its own listeners/rAF loop) and safe to
  * drop anywhere in the tree - position with the `className` prop (defaults
  * assume a `fixed inset-0` layer behind page content).
  */
-
-/** Falling-character rain, canvas-based. Respects prefers-reduced-motion by rendering nothing. */
-export function CyberCodeMatrixRain({
-  color = "#3b82f6",
-  fontSize = 14,
-  fps = 18,
-  className = "pointer-events-none fixed inset-0 z-0 opacity-10",
-}: {
-  color?: string;
-  fontSize?: number;
-  fps?: number;
-  className?: string;
-}) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    const context = canvas.getContext("2d");
-    if (!context) return;
-
-    const characters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ$#@";
-    let columns = 0;
-    let drops: number[] = [];
-    let animationId = 0;
-    let lastFrame = 0;
-
-    const resize = () => {
-      const { width, height } = canvas.getBoundingClientRect();
-      canvas.width = width;
-      canvas.height = height;
-      columns = Math.floor(canvas.width / fontSize);
-      drops = Array.from({ length: columns }, () => Math.random() * canvas.height);
-    };
-
-    const draw = () => {
-      context.fillStyle = "rgba(10, 10, 10, 0.08)";
-      context.fillRect(0, 0, canvas.width, canvas.height);
-      context.fillStyle = color;
-      context.font = `${fontSize}px "Fira Code", monospace`;
-
-      drops.forEach((drop, index) => {
-        const char = characters[Math.floor(Math.random() * characters.length)];
-        context.fillText(char, index * fontSize, drop * fontSize);
-        if (drop * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[index] = 0;
-        } else {
-          drops[index] += 1;
-        }
-      });
-    };
-
-    const loop = (timestamp: number) => {
-      const interval = fps > 0 ? 1000 / fps : Infinity;
-      if (timestamp - lastFrame >= interval) {
-        lastFrame = timestamp;
-        draw();
-      }
-      animationId = window.requestAnimationFrame(loop);
-    };
-
-    resize();
-    const observer = new ResizeObserver(resize);
-    observer.observe(canvas);
-    animationId = window.requestAnimationFrame(loop);
-
-    return () => {
-      window.cancelAnimationFrame(animationId);
-      observer.disconnect();
-    };
-  }, [color, fontSize, fps]);
-
-  return <canvas ref={canvasRef} aria-hidden="true" className={className} />;
-}
 
 /** Drifting dot field that draws connecting lines near the cursor. */
 export function CyberCodeParticleField({
