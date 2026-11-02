@@ -1,4 +1,4 @@
-import SeoHead from "@/components/SeoHead";
+import { pageMeta } from "@/lib/seo";
 import PageShell from "@/components/PageShell";
 import { ArrowRight, Terminal } from "lucide-react";
 import { about } from "@/data/about";
@@ -9,6 +9,14 @@ import {
   Typewriter,
   CyberCodeButton,
 } from "@/components/cybercode/CyberCodeUIKit";
+
+export function meta() {
+  return pageMeta({
+    title: "About | Corbin Meier",
+    description: "A journey from theoretical computer science to hands-on software architecture, driven by a relentless pursuit of digital craftsmanship.",
+    path: "/about",
+  });
+}
 
 export default function About() {
   const container: Variants = {
@@ -29,11 +37,6 @@ export default function About() {
 
   return (
     <PageShell theme="red">
-      <SeoHead
-        title="About | Corbin Meier"
-        description="A journey from theoretical computer science to hands-on software architecture, driven by a relentless pursuit of digital craftsmanship."
-        path="/about"
-      />
       <motion.main
         variants={container}
         initial="hidden"

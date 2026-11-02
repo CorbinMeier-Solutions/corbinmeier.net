@@ -5,7 +5,7 @@ import { readSiteUrl } from './scripts/site-url.mjs'
 export default defineConfig({
   define: { __SITE_URL__: JSON.stringify(readSiteUrl()) },
   resolve: {
-    alias: { '@': path.resolve(__dirname, './src') },
+    alias: { '@': path.resolve(import.meta.dirname, './src') },
   },
   test: {
     environment: 'jsdom',

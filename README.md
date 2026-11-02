@@ -6,8 +6,10 @@ their site online.
 
 ## Architecture
 
-- **React 19 + Vite**, routing with React Router, pages in `src/pages/` and
-  routes declared in `src/App.tsx`.
+- **React 19 + React Router 8 framework mode (`ssr: false`, `prerender: true`)**:
+  pages in `src/pages/`, routes in `src/routes.ts`, the document in `src/root.tsx`.
+  Every route is prerendered at build to its own HTML file with its own title
+  and meta (each page exports `meta()`); there is no `index.html` or `main.tsx`.
 - **Cloudflare Pages** hosts the static build; Pages Functions in `functions/`
   handle the contact form (`functions/api/send.ts`: Turnstile check, then email).
 - **JSON/TS content** in `src/data/`: copy, projects, pricing, FAQ. No database.
@@ -31,7 +33,7 @@ committed config file takes over from the Pages dashboard's bindings UI, so
 variables are changed here rather than there.
 
 - Build command: `npm run build`
-- Output directory: `dist` (`pages_build_output_dir`)
+- Output directory: `build/client` (`pages_build_output_dir`)
 - Compatibility flag: `nodejs_compat` (required by the email library in Functions)
 - Plain variables: `wrangler.toml` `[vars]`, repeated in `[env.preview.vars]`
   because environments do not inherit them.

@@ -1,9 +1,17 @@
 import projects from "@/data/projects.json";
 import ProjectFilters from "@/components/project-filters";
-import SeoHead from "@/components/SeoHead";
+import { pageMeta } from "@/lib/seo";
 import PageShell from "@/components/PageShell";
 import { CyberCodeTerminalLine, Typewriter } from "@/components/cybercode/CyberCodeUIKit";
 import { motion, Variants } from "framer-motion";
+
+export function meta() {
+  return pageMeta({
+    title: "Projects | Corbin Meier",
+    description: "A deep dive into the systems, applications, and digital experiences built by Corbin Meier - each project solved through meticulous engineering and user-centric design.",
+    path: "/projects",
+  });
+}
 
 export default function Projects() {
   const visibleProjects = projects.filter((p) => !("hidden" in p && p.hidden));
@@ -26,11 +34,6 @@ export default function Projects() {
 
   return (
     <PageShell theme="green">
-      <SeoHead
-        title="Projects | Corbin Meier"
-        description="A deep dive into the systems, applications, and digital experiences built by Corbin Meier - each project solved through meticulous engineering and user-centric design."
-        path="/projects"
-      />
       <motion.main
         variants={container}
         initial="hidden"

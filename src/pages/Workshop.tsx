@@ -1,17 +1,20 @@
 import { workshop } from "@/data/workshop";
 import WorkshopLog from "@/components/WorkshopLog";
-import SeoHead from "@/components/SeoHead";
+import { pageMeta } from "@/lib/seo";
 import PageShell from "@/components/PageShell";
 import PageSection from "@/components/PageSection";
+
+export function meta() {
+  return pageMeta({
+    title: "Workshop | Corbin Meier",
+    description: "Side projects and internal tools built by Corbin Meier, sectioned by category with full specs: the problem, what was built, and the stack behind it.",
+    path: "/workshop",
+  });
+}
 
 export default function Workshop() {
   return (
     <PageShell theme="yellow">
-      <SeoHead
-        title="Workshop | Corbin Meier"
-        description="Side projects and internal tools built by Corbin Meier, sectioned by category with full specs: the problem, what was built, and the stack behind it."
-        path="/workshop"
-      />
       <main className="page-container">
         <PageSection
           headingLevel={1}

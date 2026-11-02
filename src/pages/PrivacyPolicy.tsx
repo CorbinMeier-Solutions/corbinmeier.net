@@ -1,9 +1,17 @@
 import { Link } from "react-router";
-import SeoHead from "@/components/SeoHead";
+import { pageMeta } from "@/lib/seo";
 import PageShell from "@/components/PageShell";
 import { motion, Variants } from "framer-motion";
 
 const LAST_UPDATED = "July 21, 2026";
+
+export function meta() {
+  return pageMeta({
+    title: "Privacy Policy | Corbin Meier",
+    description: "Read Corbin Meier's privacy policy covering contact form data, analytics, retention, and your rights.",
+    path: "/privacy-policy",
+  });
+}
 
 export default function PrivacyPolicy() {
   const container: Variants = {
@@ -24,11 +32,6 @@ export default function PrivacyPolicy() {
 
   return (
     <PageShell>
-      <SeoHead
-        title="Privacy Policy | Corbin Meier"
-        description="Read Corbin Meier's privacy policy covering contact form data, analytics, retention, and your rights."
-        path="/privacy-policy"
-      />
       <motion.main
         variants={container}
         initial="hidden"

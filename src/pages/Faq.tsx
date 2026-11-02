@@ -1,13 +1,24 @@
 import faqs from "@/data/faqs.json";
 import FaqLog, { type FaqCategory } from "@/components/FaqLog";
-import FaqJsonLd from "@/components/FaqJsonLd";
-import SeoHead from "@/components/SeoHead";
+import { faqJsonLd } from "@/lib/faqJsonLd";
+import { pageMeta } from "@/lib/seo";
 import PageShell from "@/components/PageShell";
 import { CyberCodeTerminalLine, Typewriter } from "@/components/cybercode/CyberCodeUIKit";
 import { motion, Variants } from "framer-motion";
 
 const categories = faqs as FaqCategory[];
 const totalEntries = categories.reduce((sum, category) => sum + category.entries.length, 0);
+
+export function meta() {
+  return [
+    ...pageMeta({
+      title: "FAQ | Corbin Meier",
+      description: "A plain-English guide to SEO and mobile vs. desktop: how search ranking actually works, why SEO is billed monthly, where it gets managed, and what really changes on a small screen.",
+      path: "/faq",
+    }),
+    { "script:ld+json": faqJsonLd(categories) },
+  ];
+}
 
 export default function Faq() {
   const container: Variants = {
@@ -28,12 +39,6 @@ export default function Faq() {
 
   return (
     <PageShell theme="orange">
-      <SeoHead
-        title="FAQ | Corbin Meier"
-        description="A plain-English guide to SEO and mobile vs. desktop: how search ranking actually works, why SEO is billed monthly, where it gets managed, and what really changes on a small screen."
-        path="/faq"
-      />
-      <FaqJsonLd categories={categories} />
       <motion.main
         variants={container}
         initial="hidden"

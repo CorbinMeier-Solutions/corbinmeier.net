@@ -2,7 +2,7 @@
 name = "corbinmeier-net"
 compatibility_date = "2026-09-26"
 compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = "dist"
+pages_build_output_dir = "build/client"
 
 # Plain variables only. Secrets: npx wrangler pages secret put <NAME> --project-name corbinmeier-net
 # (production AND preview). Environments do NOT inherit [vars]: [env.preview.vars]

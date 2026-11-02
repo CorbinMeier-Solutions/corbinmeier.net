@@ -6,7 +6,7 @@ import reactRefresh from "eslint-plugin-react-refresh";
 
 export default tseslint.config(
   {
-    ignores: ["dist/**", "node_modules/**", ".wrangler/**", "public/**"],
+    ignores: ["build/**", ".react-router/**", "node_modules/**", ".wrangler/**", "public/**"],
   },
 
   // Browser-side application code.
@@ -26,6 +26,16 @@ export default tseslint.config(
       },
     },
     rules: {
+      // Route modules export meta beside their component.
+      "react-refresh/only-export-components": [
+        "error",
+        {
+          allowExportNames: [
+            "meta", "links", "loader", "action", "clientLoader", "clientAction",
+            "handle", "shouldRevalidate", "ErrorBoundary", "HydrateFallback",
+          ],
+        },
+      ],
       // Underscore prefix marks a deliberately unused binding.
       "@typescript-eslint/no-unused-vars": [
         "error",

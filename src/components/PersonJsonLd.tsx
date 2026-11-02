@@ -1,11 +1,12 @@
-import { Helmet } from "react-helmet-async";
+import { SITE_URL } from "@/config/site";
+import { serializeJsonLd } from "@/lib/jsonLd";
 
 const personJsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: "Corbin Meier",
-  url: "https://corbinmeier.net",
-  image: "https://corbinmeier.net/corbin.jpg",
+  url: SITE_URL,
+  image: `${SITE_URL}/corbin.jpg`,
   jobTitle: "Software Engineer",
   email: "mailto:contact@corbinmeier.net",
   sameAs: [
@@ -21,9 +22,5 @@ const personJsonLd = {
 };
 
 export default function PersonJsonLd() {
-  return (
-    <Helmet>
-      <script type="application/ld+json">{JSON.stringify(personJsonLd)}</script>
-    </Helmet>
-  );
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(personJsonLd) }} />;
 }

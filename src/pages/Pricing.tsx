@@ -1,21 +1,23 @@
 import { Link } from "react-router";
 import { Info, ArrowRight } from "lucide-react";
+import { pageMeta } from "@/lib/seo";
 import PageShell from "@/components/PageShell";
-import SeoHead from "@/components/SeoHead";
 import PageSection from "@/components/PageSection";
 import PackagesTable from "@/components/pricing/PackagesTable";
 import AddOnsTable from "@/components/pricing/AddOnsTable";
 import { pricing } from "@/data/pricing";
 
+export function meta() {
+  return pageMeta({
+    title: "Pricing | Corbin Meier",
+    description: "Custom websites from $1,400, built once and owned outright. Three packages, maintenance you can opt out of entirely, and add-ons with every cost and responsibility stated up front.",
+    path: "/pricing",
+  });
+}
+
 export default function Pricing() {
   return (
     <PageShell theme="teal">
-      <SeoHead
-        title="Pricing | Corbin Meier"
-        description="Custom websites from $1,400, built once and owned outright. Three packages, maintenance you can opt out of entirely, and add-ons with every cost and responsibility stated up front."
-        path="/pricing"
-      />
-
       <main className="page-container">
         <PageSection
           headingLevel={1}

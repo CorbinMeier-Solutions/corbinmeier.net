@@ -1,9 +1,17 @@
 import { Link } from "react-router";
-import SeoHead from "@/components/SeoHead";
+import { pageMeta } from "@/lib/seo";
 import PageShell from "@/components/PageShell";
 import { motion, Variants } from "framer-motion";
 
 const LAST_UPDATED = "July 21, 2026";
+
+export function meta() {
+  return pageMeta({
+    title: "Terms of Service | Corbin Meier",
+    description: "Terms of Service governing use of corbinmeier.net, its content, and the contact form.",
+    path: "/terms-of-service",
+  });
+}
 
 export default function TermsOfService() {
   const container: Variants = {
@@ -24,11 +32,6 @@ export default function TermsOfService() {
 
   return (
     <PageShell>
-      <SeoHead
-        title="Terms of Service | Corbin Meier"
-        description="Terms of Service governing use of corbinmeier.net, its content, and the contact form."
-        path="/terms-of-service"
-      />
       <motion.main
         variants={container}
         initial="hidden"
