@@ -2,7 +2,8 @@ import React from "react";
 import { render } from "@react-email/render";
 import { EmailTemplate } from "../../src/components/EmailTemplateContactConfirmation";
 import { EmailTemplateOwnerNotification } from "../../src/components/EmailTemplateOwnerNotification";
-import { EmailSendError, isValidEmail, parseRecipients, sendEmail } from "../src/services/mail";
+import { EmailSendError, parseRecipients, sendEmail } from "../lib/send-email";
+import { isValidEmail } from "../lib/validation";
 
 interface CloudflareEnv {
   CLOUDFLARE_EMAIL_API_TOKEN: string;
@@ -153,30 +154,17 @@ ${body.message ? `Message preview:\n${body.message}\n\n` : ""}- Corbin`;
 
     const fullName = [body.firstName, body.lastName].filter(Boolean).join(" ");
 
-    // One send per recipient, not one send carrying every recipient: a single
-    // bad address cannot block the others. Success is "at least one delivered".
-    let ownerDelivered = false;
-    for (const recipient of recipients) {
-      try {
-        const result = await sendEmail(env, {
-          to: recipient,
-          from: env.MAIL_FROM,
-          reply_to: { address: visitorEmail, name: fullName || undefined },
-          subject: `New contact: ${body.subject}`,
-          html: ownerHtml,
-          text: ownerText,
-        });
-        if (result.permanent_bounces.length > 0) {
-          console.error(`Permanent bounce sending the contact notification to ${recipient}`);
-        } else {
-          ownerDelivered = true;
-        }
-      } catch (error) {
-        logSendError(`contact notification to ${recipient}`, error);
-      }
-    }
-
-    if (!ownerDelivered) {
+    try {
+      await sendEmail(env, {
+        to: recipients,
+        from: env.MAIL_FROM,
+        replyTo: fullName ? `"${fullName.replace(/"/g, "'")}" <${visitorEmail}>` : visitorEmail,
+        subject: `New contact: ${body.subject}`,
+        html: ownerHtml,
+        text: ownerText,
+      });
+    } catch (error) {
+      logSendError("contact notification", error);
       return new Response(
         JSON.stringify({ error: "We couldn't send your message just now. Please try again." }),
         { status: 500, headers: { "Content-Type": "application/json" } }
@@ -186,17 +174,14 @@ ${body.message ? `Message preview:\n${body.message}\n\n` : ""}- Corbin`;
     // The visitor's confirmation is a courtesy: the inquiry already reached
     // the owner, so a failure here is logged, not shown.
     try {
-      const result = await sendEmail(env, {
+      await sendEmail(env, {
         to: visitorEmail,
         from: env.MAIL_FROM,
-        reply_to: recipients[0],
+        replyTo: recipients[0],
         subject: "Contact Confirmation",
         html: emailHtml,
         text: textContent,
       });
-      if (result.permanent_bounces.length > 0) {
-        console.error(`Permanent bounce sending the confirmation to ${visitorEmail}`);
-      }
     } catch (error) {
       logSendError("visitor confirmation", error);
     }

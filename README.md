@@ -36,7 +36,7 @@ variables are changed here rather than there.
 - Plain variables: `wrangler.toml` `[vars]`, repeated in `[env.preview.vars]`
   because environments do not inherit them.
 - Mail goes through Cloudflare Email Sending's REST API
-  (`functions/src/services/mail.ts`); Pages Functions cannot bind `send_email`.
+  (`functions/lib/send-email.ts`); Pages Functions cannot bind `send_email`.
   The sender (`MAIL_FROM`), account (`CLOUDFLARE_ACCOUNT_ID`) and recipients
   (`FORM_TO_ADDRESSES`) are `[vars]`.
 - Secrets (production and preview): `CLOUDFLARE_EMAIL_API_TOKEN` (an account
