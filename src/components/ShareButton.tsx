@@ -1,6 +1,6 @@
 // standard: share-button@2026-10-30 (endpoints checked 2026-10-30; Facebook and LinkedIn are undocumented but working)
 import { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 import { Check, Link2, Mail, Share2 } from "lucide-react";
 import { IconBrandFacebook, IconBrandLinkedin, IconBrandWhatsapp, IconBrandX } from "@tabler/icons-react";
 import { buildShareLinks, canonicalShareUrl, supportsNativeShare } from "@/lib/share";

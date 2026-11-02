@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { Info, ArrowRight } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import SeoHead from "@/components/SeoHead";

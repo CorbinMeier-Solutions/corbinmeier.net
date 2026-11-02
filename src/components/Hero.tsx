@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { motion, Variants } from "framer-motion";
 import { homeHero } from "@/data/home";
 import { site } from "@/data/site";

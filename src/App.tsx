@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router";
 import { MotionConfig } from "framer-motion";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
@@ -20,7 +20,7 @@ import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";
 
 import { useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router";
 import ContactModalProvider from "@/components/ContactModalProvider";
 import { useContactModal } from "@/components/ContactModalContext";
 

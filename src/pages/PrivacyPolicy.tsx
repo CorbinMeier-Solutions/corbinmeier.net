@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import SeoHead from "@/components/SeoHead";
 import PageShell from "@/components/PageShell";
 import { motion, Variants } from "framer-motion";
