@@ -3,12 +3,14 @@ import { useSearchParams } from "react-router-dom";
 import SeoHead from "@/components/SeoHead";
 import PageShell from "@/components/PageShell";
 import { motion, Variants } from "framer-motion";
-import { Mail, MapPin, Clock, Mailbox, Save, Bot, type LucideIcon } from "lucide-react";
+import { Mail, MapPin, Clock, Mailbox, Save, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CloudflareTurnstile } from "@/components/CloudflareTurnstile";
+import TurnstileFailureNotice from "@/components/TurnstileFailureNotice";
+import TurnstileStatusIcon from "@/components/TurnstileStatusIcon";
+import { useTurnstile } from "@/components/useTurnstile";
 import { contact } from "@/data/contact";
 import { homeHero } from "@/data/home";
-import { turnstileSiteKey } from "@/data/turnstile";
 import type { ContactInfoItem } from "@/data/types";
 import { CyberCodeTerminalWindow, CyberCodeButton, Typewriter, CyberCodeTerminalLine } from "@/components/cybercode/CyberCodeUIKit";
 
@@ -31,8 +33,7 @@ export default function Contact() {
     message: "",
   });
 
-  const [turnstileToken, setTurnstileToken] = useState<string>("");
-  const [turnstileStatus, setTurnstileStatus] = useState<"verifying" | "verified" | "expired" | "error">("verifying");
+  const turnstile = useTurnstile();
   const [status, setStatus] = useState<null | { ok: boolean; message: string }>(
     null
   );
@@ -82,26 +83,14 @@ export default function Contact() {
       return;
     }
 
-    if (!turnstileToken) {
-      // "verified" is absent by design: reaching here means no token was issued.
-      const messages: Partial<Record<typeof turnstileStatus, string>> = {
-        verifying: "Security check is running. Please wait...",
-        error: "Security verification failed. Please refresh the page and try again.",
-        expired: "Security verification expired. Please refresh the page.",
-      };
-      setStatus({
-        ok: false,
-        message: messages[turnstileStatus] || contact.validation.missingTurnstile,
-      });
-      return;
-    }
+    if (turnstile.status !== "verified") return;
 
     setLoading(true);
     try {
       const res = await fetch("/api/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, turnstileToken }),
+        body: JSON.stringify({ ...form, turnstileToken: turnstile.token }),
       });
 
       const data = (await res.json()) as { error?: string; ok?: boolean };
@@ -131,6 +120,7 @@ export default function Contact() {
       const msg = err instanceof Error ? err.message : String(err);
       setStatus({ ok: false, message: msg || "Unknown error" });
     } finally {
+      turnstile.reset();
       setLoading(false);
     }
   }
@@ -316,7 +306,7 @@ export default function Contact() {
                 <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
                   <CyberCodeButton
                     type="submit"
-                    disabled={loading || turnstileStatus === "verifying"}
+                    disabled={loading || turnstile.status !== "verified"}
                     className="w-full sm:w-auto font-mono text-xs py-1.5 px-4 disabled:opacity-60 flex items-center justify-center gap-2"
                   >
                     {loading ? (
@@ -327,59 +317,19 @@ export default function Contact() {
                         />
                         <span>Transmitting message...</span>
                       </>
-                    ) : turnstileStatus === "verifying" ? (
-                      <>
-                        <Bot className="w-4 h-4 text-[var(--accent)] animate-bounce" />
-                        <span>Scanning synapses... (are you organic?)</span>
-                      </>
                     ) : (
                       <>
                         <Save className="w-4 h-4 text-[var(--accent)]" />
-                        <span>Submit (Humanity Passed)</span>
+                        <span>Submit</span>
                       </>
                     )}
                   </CyberCodeButton>
 
-                  <div className="flex items-center gap-2 text-xs font-mono select-none">
-                    <span className={cn(
-                      "w-2 h-2 rounded-full",
-                      turnstileStatus === "verified" && "bg-emerald-500 animate-pulse",
-                      turnstileStatus === "verifying" && "bg-amber-500 animate-ping",
-                      (turnstileStatus === "error" || turnstileStatus === "expired") && "bg-rose-500 animate-pulse"
-                    )} />
-                    <span className={cn(
-                      turnstileStatus === "verified" && "text-emerald-500",
-                      turnstileStatus === "verifying" && "text-amber-500",
-                      (turnstileStatus === "error" || turnstileStatus === "expired") && "text-rose-500"
-                    )}>
-                      {turnstileStatus === "verifying" && "[human_check: pending...]"}
-                      {turnstileStatus === "verified" && "[human_check: verified]"}
-                      {turnstileStatus === "expired" && "[human_check: expired]"}
-                      {turnstileStatus === "error" && "[human_check: failed]"}
-                    </span>
-                  </div>
+                  <TurnstileStatusIcon status={turnstile.status} />
                 </div>
+                <CloudflareTurnstile key={turnstile.widgetKey} action="send" {...turnstile.widgetProps} />
+                <TurnstileFailureNotice status={turnstile.status} onRetry={turnstile.retry} />
 
-                  {/* Never wrapped in display:none - the widget renders into an
-                      iframe and hangs indefinitely if its container is hidden.
-                      The invisible size keeps it out of the layout instead. */}
-                  <CloudflareTurnstile
-                    siteKey={turnstileSiteKey}
-                    onVerify={(token) => {
-                      setTurnstileToken(token);
-                      setTimeout(() => {
-                        setTurnstileStatus("verified");
-                      }, 5000);
-                    }}
-                    onError={() => {
-                      setTurnstileToken("");
-                      setTurnstileStatus("error");
-                    }}
-                    onExpire={() => {
-                      setTurnstileToken("");
-                      setTurnstileStatus("expired");
-                    }}
-                  />
 
                 {status && (
                   <motion.div

@@ -5,5 +5,6 @@
 | `check.sh` | Lint, typecheck, test, build; stops at the first failure; records `.check-result` | `scripts/check.sh` | `CHECK PASS` |
 | `check-result.sh` | Sourced by `check.sh`: writes `.check-result` for the hub handback | - | - |
 | `check-faq-sources.mjs` | Verifies every citation link in `src/data/faqs.json` resolves and flags hosts outside source tiers 1-2 | `npm run check:sources` | a clean report, exit 0 |
+| `check-turnstile-key.mjs` | Fails the production Pages build (main) when `src/data/turnstile.ts` has no real `0x` site key; warns elsewhere | runs first in `npm run build` | silent with a real key |
 | `sync-project-images.mjs` | Syncs project images before `dev` and `build` (runs as `predev`/`prebuild`) | automatic | no output on success |
 | `one-off/` | Single-use scripts, named `YYYY-MM-DD-<slug>.sh`, kept as the record | - | - |

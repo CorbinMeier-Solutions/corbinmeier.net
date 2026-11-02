@@ -1,4 +1,4 @@
-// standard: turnstile@2026-09-12 (~/Code/Work/Sites/standards/turnstile/README.md)
+// standard: turnstile@2026-10-30
 //
 // The site key is committed content, never a build/deploy variable. Routed
 // through one, an unset or renamed variable silently disables the whole check
