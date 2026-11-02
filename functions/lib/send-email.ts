@@ -6,6 +6,7 @@
  */
 // standard: email-transport@2026-10-16
 // The only code that talks to the mail provider (Cloudflare Email Sending, REST).
+import { classifyEmailSending, EMAIL_TOKEN_REF, missingKey, type KeyFailure } from "./key-alert";
 
 const API_BASE = "https://api.cloudflare.com/client/v4";
 
@@ -44,13 +45,16 @@ export class EmailSendError extends Error {
   detail: string;
   /** 429 and 5xx are worth another attempt; validation and auth failures are not. */
   retryable: boolean;
+  /** Set when the cause is the API token (key-failure-alerts); the caller reports it. */
+  credential: KeyFailure | null;
 
-  constructor(message: string, status: number, detail: string) {
+  constructor(message: string, status: number, detail: string, credential: KeyFailure | null = null) {
     super(message);
     this.name = "EmailSendError";
     this.status = status;
     this.detail = detail;
     this.retryable = status === 429 || status >= 500;
+    this.credential = credential;
   }
 }
 
@@ -87,7 +91,8 @@ async function sendOne(env: Required<MailEnv>, recipient: string, message: Email
 
   if (!response.ok || !envelope?.success || !envelope.result) {
     const detail = envelope?.errors?.map((e) => `${e.code}: ${e.message}`).join("; ") || bodyText;
-    throw new EmailSendError("Email Sending rejected the message.", response.status, detail);
+    const credential = classifyEmailSending(response.status, envelope?.errors ?? []);
+    throw new EmailSendError("Email Sending rejected the message.", response.status, detail, credential);
   }
   if (envelope.result.permanent_bounces.length > 0) {
     throw new EmailSendError("Email Sending reported a permanent bounce.", response.status, "permanent bounce");
@@ -105,7 +110,8 @@ export async function sendEmail(env: MailEnv, message: EmailMessage): Promise<vo
     throw new EmailSendError(
       "Email Sending is not configured.",
       0,
-      "CLOUDFLARE_ACCOUNT_ID and/or CLOUDFLARE_EMAIL_API_TOKEN are missing from the Pages environment."
+      "CLOUDFLARE_ACCOUNT_ID and/or CLOUDFLARE_EMAIL_API_TOKEN are missing from the Pages environment.",
+      CLOUDFLARE_EMAIL_API_TOKEN ? null : missingKey(EMAIL_TOKEN_REF)
     );
   }
   const recipients = parseRecipients(message.to);

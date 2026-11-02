@@ -8,4 +8,7 @@ interface CloudflareEnv {
   MAIL_FROM: string;
   FORM_TO_ADDRESSES: string;
   TURNSTILE_SECRET: string;
+  KEY_ALERT_GITHUB_PAT?: string;
+  KEY_ALERT_GITHUB_REPO?: string;
+  SITE_URL?: string;
 }
