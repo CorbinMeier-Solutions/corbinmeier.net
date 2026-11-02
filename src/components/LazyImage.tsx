@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { motion, HTMLMotionProps } from "framer-motion";
 
 interface LazyImageProps extends Omit<HTMLMotionProps<"img">, "onLoad" | "onError"> {
@@ -23,64 +23,25 @@ export default function LazyImage({
   // src (e.g. inside a modal carousel) resets the state by derivation, not an effect.
   const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
   const [errorSrc, setErrorSrc] = useState<string | null>(null);
-  const [isInView, setIsInView] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const isLoaded = loadedSrc === src;
   const error = errorSrc === src;
 
-  useEffect(() => {
-    const triggerLoad = () => {
-      const loadCallback = () => {
-        setIsInView(true);
-      };
-      if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-        window.requestIdleCallback(loadCallback);
-      } else {
-        setTimeout(loadCallback, 0);
-      }
-    };
-
-    if (priority) {
-      triggerLoad();
-      return;
-    }
-
-    if (typeof window === "undefined" || !("IntersectionObserver" in window)) {
-      triggerLoad();
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          triggerLoad();
-          observer.disconnect();
-        }
-      },
-      {
-        rootMargin: "200px", // Loads the next thing on the page slightly before it scrolls into view
-      }
-    );
-
-    const currentRef = containerRef.current;
-    if (currentRef) {
-      observer.observe(currentRef);
-    }
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [priority]);
+  // An image can finish (or fail) before hydration attaches onLoad/onError, so
+  // settle from the element's own state when it mounts.
+  const settleIfDone = (img: HTMLImageElement | null) => {
+    if (!img || !img.complete) return;
+    if (img.naturalWidth > 0) setLoadedSrc(src);
+    else setErrorSrc(src);
+  };
 
   return (
     <div
-      ref={containerRef}
       className={`relative overflow-hidden flex items-center justify-center ${className}`}
     >
       {/* Cyberpunk Spinner - shows while loading */}
-      {!isLoaded && !error && isInView && (
-        <div className="absolute inset-0 flex items-center justify-center bg-muted/5 backdrop-blur-sm z-10">
+      {!isLoaded && !error && (
+        <div className="absolute inset-0 flex items-center justify-center bg-muted/5 z-10">
           <div className="relative flex items-center justify-center">
             <div className="w-8 h-8 rounded-full border-2 border-accent/20 border-t-accent animate-spin" />
             <div className="absolute w-8 h-8 rounded-full border border-accent/40 animate-ping opacity-40 scale-75" />
@@ -109,20 +70,21 @@ export default function LazyImage({
         </div>
       )}
 
-      {/* Render actual image once in view */}
-      {isInView && (
-        <motion.img
-          src={src}
-          alt={alt}
-          onLoad={() => setLoadedSrc(src)}
-          onError={() => setErrorSrc(src)}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: isLoaded ? 1 : 0 }}
-          transition={{ duration: 0.2 }}
-          className={imgClassName}
-          {...props}
-        />
-      )}
+      {/* Real img in the server render; the browser lazy-loads it natively */}
+      <motion.img
+        ref={settleIfDone}
+        src={src}
+        alt={alt}
+        loading={priority ? "eager" : "lazy"}
+        decoding="async"
+        onLoad={() => setLoadedSrc(src)}
+        onError={() => setErrorSrc(src)}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isLoaded ? 1 : 0 }}
+        transition={{ duration: 0.2 }}
+        className={imgClassName}
+        {...props}
+      />
     </div>
   );
 }
