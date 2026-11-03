@@ -4,14 +4,18 @@ import Services from "@/components/Services";
 import FeaturedProjects from "@/components/FeaturedProjects";
 import CTA from "@/components/CTA";
 import { pageMeta } from "@/lib/seo";
+import { websiteJsonLd } from "@/lib/websiteJsonLd";
 import PageShell from "@/components/PageShell";
 
 export function meta() {
-  return pageMeta({
-    title: "Custom websites, built right. | Corbin Meier",
-    description: "I design and build custom, high-performance websites for local businesses - quoted fairly to fit your project and budget.",
-    path: "/",
-  });
+  return [
+    ...pageMeta({
+      title: "Custom websites, built right. | Corbin Meier",
+      description: "I design and build custom, high-performance websites for local businesses - quoted fairly to fit your project and budget.",
+      path: "/",
+    }),
+    { "script:ld+json": websiteJsonLd() },
+  ];
 }
 
 export default function Home() {
