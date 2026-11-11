@@ -52,14 +52,14 @@ function EntryImageModal({
           <button
             onClick={(e) => { e.stopPropagation(); onNavigate(-1); }}
             aria-label="Previous image"
-            className="hidden tablet:flex absolute left-2 desktop:left-6 top-1/2 -translate-y-1/2 z-10 p-3 bg-background/60 hover:bg-background/90 border border-white/10 rounded-full transition-all items-center justify-center"
+            className="hidden tablet:flex absolute left-2 desktop:left-6 top-1/2 -translate-y-1/2 z-10 p-3 bg-background/60 hover:bg-background/90 border border-white/10 rounded-full transition-colors items-center justify-center"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); onNavigate(1); }}
             aria-label="Next image"
-            className="hidden tablet:flex absolute right-2 desktop:right-6 top-1/2 -translate-y-1/2 z-10 p-3 bg-background/60 hover:bg-background/90 border border-white/10 rounded-full transition-all items-center justify-center"
+            className="hidden tablet:flex absolute right-2 desktop:right-6 top-1/2 -translate-y-1/2 z-10 p-3 bg-background/60 hover:bg-background/90 border border-white/10 rounded-full transition-colors items-center justify-center"
           >
             <ChevronRight className="w-6 h-6" />
           </button>

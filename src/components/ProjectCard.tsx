@@ -97,7 +97,7 @@ export default function ProjectCard({
         title={`${project.slug}.${project.extension || "sh"}`}
         icon={getProjectIcon(project.extension)}
         showDots={false}
-        className="h-full border-border bg-card transition-all duration-500 group-hover:border-accent/50 relative"
+        className="h-full border-border bg-card transition-colors duration-500 group-hover:border-accent/50 relative"
       >
         {/* Glow Effect */}
         <motion.div
@@ -160,7 +160,7 @@ export default function ProjectCard({
     </div>
   );
 
-  const baseClass = cn("block text-left transition-all duration-300 w-full", className);
+  const baseClass = cn("block text-left transition-colors duration-300 w-full", className);
 
   if (href) {
     return (

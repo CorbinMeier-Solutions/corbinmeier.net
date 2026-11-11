@@ -188,15 +188,15 @@ html.theme-contact, html.theme-contact body {
   }
 
   .btn-artisan {
-    @apply inline-flex items-center gap-2 bg-primary text-background px-10 py-5 rounded-full font-bold text-lg transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] hover:bg-accent;
+    @apply inline-flex items-center gap-2 bg-primary text-background px-10 py-5 rounded-full font-bold text-lg transition-[background-color,scale] duration-500 hover:scale-[1.02] active:scale-[0.98] hover:bg-accent;
   }
 
   .btn-mini {
-    @apply inline-flex items-center gap-1 rounded-md border px-2 py-[1px] font-mono text-[10px] transition-all hover:bg-[rgba(var(--accent-rgb),0.25)];
+    @apply inline-flex items-center gap-1 rounded-md border px-2 py-[1px] font-mono text-[10px] transition-colors hover:bg-[rgba(var(--accent-rgb),0.25)];
   }
 
   .card-glow {
-    @apply relative overflow-hidden transition-all duration-300;
+    @apply relative overflow-hidden transition-colors duration-300;
   }
 
   /* FAQ answers are authored as HTML strings in src/data/faqs.json and injected

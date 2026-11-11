@@ -94,7 +94,7 @@ export default function Services() {
                 >
                   <Link
                     to={s.link}
-                    className="relative glass-panel p-8 group hover:border-accent/30 transition-all duration-300 block h-full"
+                    className="relative glass-panel p-8 group hover:border-accent/30 transition-colors duration-300 block h-full"
                   >
                     {Content}
                   </Link>
@@ -106,7 +106,7 @@ export default function Services() {
               <motion.div
                 key={s.id}
                 variants={item}
-                className="relative glass-panel p-8 group hover:border-accent/30 transition-all duration-300"
+                className="relative glass-panel p-8 group hover:border-accent/30 transition-colors duration-300"
               >
                 {Content}
               </motion.div>

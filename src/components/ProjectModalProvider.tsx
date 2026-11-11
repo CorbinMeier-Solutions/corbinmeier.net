@@ -126,14 +126,14 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
                 <button
                   onClick={(e) => { e.stopPropagation(); navigateProject(-1); }}
                   aria-label="Previous project"
-                  className="hidden desktop:flex absolute left-2 desktop:left-6 top-1/2 -translate-y-1/2 z-10 p-3 bg-background/60 hover:bg-background/90 border border-white/10 rounded-full transition-all items-center justify-center"
+                  className="hidden desktop:flex absolute left-2 desktop:left-6 top-1/2 -translate-y-1/2 z-10 p-3 bg-background/60 hover:bg-background/90 border border-white/10 rounded-full transition-colors items-center justify-center"
                 >
                   <ChevronLeft className="w-6 h-6" />
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); navigateProject(1); }}
                   aria-label="Next project"
-                  className="hidden desktop:flex absolute right-2 desktop:right-6 top-1/2 -translate-y-1/2 z-10 p-3 bg-background/60 hover:bg-background/90 border border-white/10 rounded-full transition-all items-center justify-center"
+                  className="hidden desktop:flex absolute right-2 desktop:right-6 top-1/2 -translate-y-1/2 z-10 p-3 bg-background/60 hover:bg-background/90 border border-white/10 rounded-full transition-colors items-center justify-center"
                 >
                   <ChevronRight className="w-6 h-6" />
                 </button>
@@ -259,13 +259,13 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
                       <>
                         <button 
                           onClick={(e) => { e.stopPropagation(); paginate(-1); }}
-                          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-2 bg-background/60 hover:bg-background/80 border border-white/10 rounded-full transition-all opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100"
+                          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-2 bg-background/60 hover:bg-background/80 border border-white/10 rounded-full transition-[background-color,opacity] opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100"
                         >
                           <ChevronLeft className="w-5 h-5" />
                         </button>
                         <button 
                           onClick={(e) => { e.stopPropagation(); paginate(1); }}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-2 bg-background/60 hover:bg-background/80 border border-white/10 rounded-full transition-all opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-2 bg-background/60 hover:bg-background/80 border border-white/10 rounded-full transition-[background-color,opacity] opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100"
                         >
                           <ChevronRight className="w-5 h-5" />
                         </button>
@@ -283,7 +283,7 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
                             setDirection(0 > activeIndex ? 1 : -1);
                             setActiveIndex(0);
                           }}
-                          className={`relative w-20 aspect-video rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 ${
+                          className={`relative w-20 aspect-video rounded-lg overflow-hidden border-2 transition-[border-color,scale] flex-shrink-0 ${
                             activeIndex === 0 ? "border-accent scale-95" : "border-border/50 hover:border-border scale-100"
                           }`}
                         >
@@ -302,7 +302,7 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
                               setDirection(slideIdx > activeIndex ? 1 : -1);
                               setActiveIndex(slideIdx);
                             }}
-                            className={`relative w-20 aspect-video rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 ${
+                            className={`relative w-20 aspect-video rounded-lg overflow-hidden border-2 transition-[border-color,scale] flex-shrink-0 ${
                               slideIdx === activeIndex ? "border-accent scale-95" : "border-border/50 hover:border-border scale-100"
                             }`}
                           >

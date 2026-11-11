@@ -377,7 +377,7 @@ export function CyberCodeProjectCard({
   return (
     <article
       className={cx(
-        "overflow-hidden rounded-xl border border-border bg-card transition-all hover:-translate-y-2",
+        "overflow-hidden rounded-xl border border-border bg-card transition-transform hover:-translate-y-2",
         className
       )}
       style={accentVars(accent)}
@@ -422,7 +422,7 @@ export function CyberCodeTag({
 /* ------------------------------------------------------------------------ */
 
 const BUTTON_CLASSNAME =
-  "inline-flex items-center justify-center gap-2 rounded-md border px-6 py-3 font-mono text-sm text-[var(--cc-text)] transition-all hover:-translate-y-0.5 hover:[text-shadow:var(--cc-glow)]";
+  "inline-flex items-center justify-center gap-2 rounded-md border px-6 py-3 font-mono text-sm text-[var(--cc-text)] transition-[translate,text-shadow] hover:-translate-y-0.5 hover:[text-shadow:var(--cc-glow)]";
 
 /**
  * `to` renders a react-router `Link` styled as this button (for internal
@@ -556,7 +556,7 @@ export function CyberCodeSocialLink({
     <a
       aria-label={label}
       className={cx(
-        "group relative flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-white/5 text-lg text-muted transition-all hover:-translate-y-1 hover:text-[var(--cc-text)]",
+        "group relative flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-white/5 text-lg text-muted transition-[color,translate] hover:-translate-y-1 hover:text-[var(--cc-text)]",
         className
       )}
       style={{ ...accentVars(accent), ["--tw-hover-border" as string]: "var(--cc-border)" }}

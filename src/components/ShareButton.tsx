@@ -79,7 +79,7 @@ export default function ShareButton() {
         aria-haspopup="true"
         aria-expanded={open}
         onClick={onToggle}
-        className="group flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-white/5 text-muted transition-all hover:-translate-y-1 hover:text-accent"
+        className="group flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-white/5 text-muted transition-[color,translate] hover:-translate-y-1 hover:text-accent"
       >
         <Share2 className="w-5 h-5" />
       </button>
