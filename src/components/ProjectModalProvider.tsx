@@ -8,6 +8,7 @@ import LazyImage from "./LazyImage";
 import { CyberCodeTerminalWindow, CyberCodeWindowChrome } from "./cybercode/CyberCodeUIKit";
 import { ProjectModalContext } from "./ProjectModalContext";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 
 export default function ProjectModalProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,7 +21,10 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
   // when the pointer is released at the end of a drag.
   const didDrag = useRef(false);
 
+  const dialogRef = useRef<HTMLDivElement>(null);
+
   useBodyScrollLock(isOpen);
+  useDialogFocus(isOpen && project !== null, dialogRef);
 
   const hasBeforeAfter = !!(project?.beforeAfter?.before?.image && project?.beforeAfter?.after?.image);
   const totalSlides = (hasBeforeAfter ? 1 : 0) + (project?.images?.length || 0);
@@ -112,7 +116,14 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
       {children}
       <AnimatePresence>
         {isOpen && project && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 tablet:p-6 desktop:p-8">
+          <div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="project-dialog-title"
+            tabIndex={-1}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 tablet:p-6 desktop:p-8 outline-none"
+          >
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -325,7 +336,7 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
                       <CyberCodeTerminalWindow title="details.data" showDots={false}>
                         <div className="font-mono text-sm space-y-2">
                           <div>
-                            <span className="text-muted">Title:</span> <span className="text-foreground font-bold">{project.title}</span>
+                            <span className="text-muted">Title:</span> <span id="project-dialog-title" className="text-foreground font-bold">{project.title}</span>
                           </div>
                           {project["public-url"] && (
                             <div className="truncate">

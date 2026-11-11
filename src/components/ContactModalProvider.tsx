@@ -1,4 +1,4 @@
-import React, { useState, ReactNode, useEffect, useCallback, useMemo } from "react";
+import React, { useState, ReactNode, useEffect, useCallback, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, MapPin, Clock, Mailbox, Save, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -10,6 +10,7 @@ import { contact } from "@/data/contact";
 import { homeHero } from "@/data/home";
 import type { ContactInfoItem } from "@/data/types";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { CyberCodeTerminalWindow, CyberCodeButton, CyberCodeTerminalLine, CyberCodeWindowChrome } from "@/components/cybercode/CyberCodeUIKit";
 import { ContactModalContext } from "./ContactModalContext";
 
@@ -23,7 +24,10 @@ const CONTACT_ICONS: Record<ContactInfoItem["icon"], LucideIcon> = {
 export default function ContactModalProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
 
+  const dialogRef = useRef<HTMLDivElement>(null);
+
   useBodyScrollLock(isOpen);
+  useDialogFocus(isOpen, dialogRef);
 
   // Form states maintained in provider to persist when closed/reopened
   const [form, setForm] = useState({
@@ -193,7 +197,14 @@ export default function ContactModalProvider({ children }: { children: ReactNode
 
       <AnimatePresence>
         {isOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 tablet:p-6 desktop:p-8">
+          <div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="contact-dialog-title"
+            tabIndex={-1}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 tablet:p-6 desktop:p-8 outline-none"
+          >
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -224,7 +235,7 @@ export default function ContactModalProvider({ children }: { children: ReactNode
                         <CyberCodeTerminalLine prompt=">" className="mb-2">
                           <span className="font-mono text-sm">mailto contact@corbinmeier.net</span>
                         </CyberCodeTerminalLine>
-                        <h2 className="text-2xl tablet:text-3xl font-serif mb-4">
+                        <h2 id="contact-dialog-title" className="text-2xl tablet:text-3xl font-serif mb-4">
                           {contact.heading}
                         </h2>
                         {form.subject.toLowerCase() === "strategic partnership" ? (
