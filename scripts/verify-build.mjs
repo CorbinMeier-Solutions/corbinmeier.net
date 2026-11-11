@@ -1,7 +1,9 @@
 // Usage:   node scripts/verify-build.mjs   (runs at the end of `npm run build`, after scripts/build-llms.mjs;
 //          runs from any cwd, finds the project root from its own location: <root>/scripts/)
 // Does:    asserts on the built output in build/client (scripts/check.sh runs tests before the build):
-//          1. Every sitemap.xml URL appears as a plain <a href> (path or absolute) in at least one other built page.
+//          1. Every indexable page (no robots noindex) has exactly one <link rel="canonical">; every noindex page
+//             (/contact, 404) has none.
+//          2. Every sitemap.xml URL appears as a plain <a href> (path or absolute) in at least one other built page.
 //          Skips Google verification files and __spa-fallback.html.
 // Success: prints "VERIFY PASS (<n> pages)". Failure: "VERIFY FAIL: <finding>" per line and exit 1.
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
@@ -40,6 +42,14 @@ export function normalizeUrl(href, origin) {
   return url.origin + path
 }
 
+/** Findings for canonical counts: one on an indexable page, none on a noindex page. pages: [{ file, canonicals, noindex }]. */
+export function canonicalFindings(pages) {
+  return pages.flatMap(({ file, canonicals, noindex }) => {
+    if (noindex) return canonicals.length ? [`${file} is noindex but has ${canonicals.length} canonical link(s)`] : []
+    return canonicals.length === 1 ? [] : [`${file} is indexable and must have exactly one canonical, found ${canonicals.length}`]
+  })
+}
+
 /** Findings for sitemap URLs that no other page links with a plain <a href>. pages: [{ file, canonicals, hrefs }]. */
 export function unlinkedFindings(locs, pages, origin) {
   return locs.flatMap((loc) => {
@@ -63,7 +73,7 @@ function listPages(dir) {
 export function run(out) {
   const files = listPages(out)
   const pages = files.map((path) => ({ file: relative(out, path), ...readPageFacts(readFileSync(path, 'utf8')) }))
-  const findings = []
+  const findings = canonicalFindings(pages)
   const sitemapPath = join(out, 'sitemap.xml')
   if (!existsSync(sitemapPath)) findings.push('sitemap.xml is missing from the build')
   else {

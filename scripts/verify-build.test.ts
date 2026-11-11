@@ -1,11 +1,32 @@
 import { describe, expect, it } from 'vitest'
 import {
+  canonicalFindings,
   normalizeUrl,
+  readPageFacts,
   sitemapLocs,
   unlinkedFindings,
 } from './verify-build.mjs'
 
 const ORIGIN = 'https://example.test'
+describe('readPageFacts + canonicalFindings', () => {
+  const page = (head: string, body = '') => readPageFacts(`<html><head>${head}</head><body>${body}</body></html>`)
+  const canon = '<link rel="canonical" href="https://example.test/a">'
+
+  it('passes one canonical on indexable and none on noindex pages', () => {
+    const pages = [
+      { file: 'a.html', ...page(canon) },
+      { file: 'contact.html', ...page('<meta name="robots" content="noindex"/>') },
+    ]
+    expect(canonicalFindings(pages)).toEqual([])
+  })
+  it('fails zero or two canonicals on an indexable page', () => {
+    expect(canonicalFindings([{ file: 'a.html', ...page('') }])[0]).toContain('found 0')
+    expect(canonicalFindings([{ file: 'a.html', ...page(canon + canon) }])[0]).toContain('found 2')
+  })
+  it('fails a canonical on a noindex page', () => {
+    expect(canonicalFindings([{ file: 'c.html', ...page('<meta name="robots" content="noindex,follow">' + canon) }])).toHaveLength(1)
+  })
+})
 
 describe('sitemap link assertion', () => {
   const xml = '<urlset><url><loc>https://example.test</loc></url><url><loc>https://example.test/pricing</loc></url></urlset>'
