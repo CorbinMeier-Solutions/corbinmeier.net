@@ -15,17 +15,25 @@ import {
 } from './verify-build.mjs'
 
 const ORIGIN = 'https://example.test'
-const line = 'google-site-verification: googlef16b5b81923cc5d2.html'
+const file = 'googlef16b5b81923cc5d2.html'
+const fleetFile = 'googlef927db9e19f8bd64.html'
+const line = `google-site-verification: ${file}`
+const fleetLine = `google-site-verification: ${fleetFile}`
 
 describe('verificationFindings', () => {
   it('accepts the exact line with or without one trailing newline', () => {
-    expect(verificationFindings(line)).toEqual([])
-    expect(verificationFindings(line + '\n')).toEqual([])
+    expect(verificationFindings(line, file)).toEqual([])
+    expect(verificationFindings(line + '\n', file)).toEqual([])
+  })
+  it('names the file it checked, and rejects the other file\'s line', () => {
+    expect(verificationFindings(fleetLine, fleetFile)).toEqual([])
+    expect(verificationFindings(null, fleetFile)[0]).toContain(fleetFile)
+    expect(verificationFindings(line, fleetFile)[0]).toContain(fleetFile)
   })
   it('flags a missing file and altered content', () => {
-    expect(verificationFindings(null)[0]).toContain('missing')
-    expect(verificationFindings(line + '\n\n')).toHaveLength(1)
-    expect(verificationFindings('<html></html>')).toHaveLength(1)
+    expect(verificationFindings(null, file)[0]).toContain('missing')
+    expect(verificationFindings(line + '\n\n', file)).toHaveLength(1)
+    expect(verificationFindings('<html></html>', file)).toHaveLength(1)
   })
 })
 
@@ -98,7 +106,8 @@ describe('run over a fixture build', () => {
     const files: Record<string, string> = {
       'index.html': html(ORIGIN, ['/pricing']),
       'pricing.html': html(ORIGIN + '/pricing', ['/']),
-      'googlef16b5b81923cc5d2.html': line,
+      [file]: line,
+      [fleetFile]: fleetLine,
       'google1234abcd.html': '<html></html>',
       '__spa-fallback.html': '<html></html>',
       'assets/skipped.html': '<html></html>',
@@ -119,10 +128,15 @@ describe('run over a fixture build', () => {
     fixture(null)
     expect(run(dir, '2026-11-10').findings).toEqual(['sitemap.xml is missing from the build'])
   })
+  it('reports a missing fleet verification file by name', () => {
+    fixture(urlset('<lastmod>2026-11-03</lastmod>'))
+    rmSync(join(dir, fleetFile))
+    expect(run(dir, '2026-11-10').findings).toEqual([`${fleetFile} is missing from the build`])
+  })
   it('reports bad lastmod dates and a wrong verification file by name', () => {
-    fixture(urlset('<lastmod>2027-01-01</lastmod>'), { 'googlef16b5b81923cc5d2.html': 'wrong' })
+    fixture(urlset('<lastmod>2027-01-01</lastmod>'), { [file]: 'wrong' })
     const findings = run(dir, '2026-11-10').findings
-    expect(findings.some((f) => f.includes('googlef16b5b81923cc5d2.html must contain'))).toBe(true)
+    expect(findings.some((f) => f.includes(`${file} must contain`))).toBe(true)
     expect(findings.filter((f) => f.includes('later than today'))).toHaveLength(2)
   })
 })
