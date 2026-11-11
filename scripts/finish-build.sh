@@ -162,15 +162,15 @@ origin = "https://" + pu.netloc
 
 if not sm_public:
     locs = set()
-    for root, dirs, files in os.walk(out):
+    for base, dirs, files in os.walk(out):
         dirs[:] = [d for d in dirs if not d.startswith(".")]
         for fn in files:
             if not fn.endswith(".html"):
                 continue
-            rel = os.path.relpath(os.path.join(root, fn), out)
+            rel = os.path.relpath(os.path.join(base, fn), out)
             if rel in ("404.html", "__spa-fallback.html"):
                 continue
-            h = scan(os.path.join(root, fn))
+            h = scan(os.path.join(base, fn))
             if h is None or h.noindex:
                 continue
             if not h.canon:
