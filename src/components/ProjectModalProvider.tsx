@@ -22,12 +22,22 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
   const didDrag = useRef(false);
 
   const dialogRef = useRef<HTMLDivElement>(null);
+  const fullscreenRef = useRef<HTMLDivElement>(null);
+  const fullscreenCloseRef = useRef<HTMLButtonElement>(null);
 
   useBodyScrollLock(isOpen);
-  useDialogFocus(isOpen && project !== null, dialogRef);
 
   const hasBeforeAfter = !!(project?.beforeAfter?.before?.image && project?.beforeAfter?.after?.image);
   const totalSlides = (hasBeforeAfter ? 1 : 0) + (project?.images?.length || 0);
+  const showFullscreen = isFullscreen && !!project?.images && (!hasBeforeAfter || activeIndex !== 0);
+
+  // The fullscreen view stacks on the dialog: it owns Tab while open, and the
+  // dialog's trap pauses so the two never fight over focus.
+  useDialogFocus(isOpen && project !== null, dialogRef, showFullscreen);
+  useDialogFocus(showFullscreen, fullscreenRef);
+  useEffect(() => {
+    if (showFullscreen) fullscreenCloseRef.current?.focus();
+  }, [showFullscreen]);
 
   const open = (p: Project, list?: Project[]) => {
     setProject(p);
@@ -251,6 +261,7 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
                                   e.stopPropagation();
                                   setIsFullscreen(true);
                                 }}
+                                aria-label="View full screen"
                                 className="p-3 bg-black border border-white/50 rounded-xl text-white shadow-none hover:scale-110 transition-transform flex items-center gap-2"
                               >
                                 <Maximize2 className="w-4 h-4" />
@@ -485,12 +496,17 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
 
       {/* Fullscreen Overlay */}
       <AnimatePresence>
-        {isFullscreen && project && project.images && (!hasBeforeAfter || activeIndex !== 0) && (
+        {showFullscreen && project && project.images && (
           <motion.div
+            ref={fullscreenRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Full screen image"
+            tabIndex={-1}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-black/95 flex items-center justify-center p-4 tablet:p-12 overflow-hidden"
+            className="fixed inset-0 z-[200] bg-black/95 flex items-center justify-center p-4 tablet:p-12 overflow-hidden outline-none"
             onClick={() => setIsFullscreen(false)}
           >
             <motion.div 
@@ -516,7 +532,9 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
               
               {/* Close Button Fullscreen */}
               <button 
+                ref={fullscreenCloseRef}
                 onClick={() => setIsFullscreen(false)}
+                aria-label="Close full screen"
                 className="absolute top-0 right-0 p-4 text-white/50 hover:text-white transition-colors"
               >
                 <X className="w-8 h-8" />
