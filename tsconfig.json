@@ -21,5 +21,6 @@
     }
   },
   "include": ["src", "functions", "scripts"],
+  "exclude": [".claude/worktrees"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

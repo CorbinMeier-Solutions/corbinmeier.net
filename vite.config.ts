@@ -10,6 +10,7 @@ export default defineConfig({
     tailwindcss(),
   ],
   define: { __SITE_URL__: JSON.stringify(readSiteUrl()) },
+  server: { watch: { ignored: ['**/.claude/worktrees/**'] } },
   envPrefix: ['VITE_', 'TURNSTILE_'],
   resolve: {
     alias: {

@@ -6,7 +6,7 @@ import reactRefresh from "eslint-plugin-react-refresh";
 
 export default tseslint.config(
   {
-    ignores: ["build/**", ".react-router/**", "node_modules/**", ".wrangler/**", "public/**"],
+    ignores: ["build/**", ".react-router/**", "node_modules/**", ".wrangler/**", "public/**", ".claude/worktrees/**"],
   },
 
   // Browser-side application code.

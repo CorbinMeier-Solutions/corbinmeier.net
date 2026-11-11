@@ -61,6 +61,7 @@ docs/legal/
 # AI working files: local-only, repo is public
 CLAUDE.md
 .claude/
+.claude/worktrees/
 .corbin/
 .impeccable/
 .project_map.txt

@@ -1,5 +1,5 @@
 import path from 'path'
-import { defineConfig } from 'vitest/config'
+import { configDefaults, defineConfig } from 'vitest/config'
 import { readSiteUrl } from './scripts/site-url.mjs'
 
 export default defineConfig({
@@ -10,6 +10,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     include: ['src/**/*.test.{ts,tsx}', 'functions/**/*.test.ts', 'scripts/**/*.test.ts'],
+    exclude: [...configDefaults.exclude, '.claude/worktrees/**'],
     setupFiles: ['src/test-setup.ts'],
   },
 })
