@@ -1,4 +1,4 @@
-import React, { useState, ReactNode, useEffect, useCallback, useMemo, useRef } from "react";
+import React, { useState, ReactNode, useEffect, useCallback, useMemo, useRef, useId } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, MapPin, Clock, Mailbox, Save, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -22,6 +22,7 @@ const CONTACT_ICONS: Record<ContactInfoItem["icon"], LucideIcon> = {
 };
 
 export default function ContactModalProvider({ children }: { children: ReactNode }) {
+  const fieldId = useId();
   const [isOpen, setIsOpen] = useState(false);
 
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -293,11 +294,13 @@ export default function ContactModalProvider({ children }: { children: ReactNode
                       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
                         <div className="grid grid-cols-1 tablet:grid-cols-2 gap-4">
                           <div className="flex flex-col gap-1 py-1">
-                            <label className={cn(
+                            <label htmlFor={`${fieldId}-first-name`} className={cn(
                               "font-mono text-xs select-none transition-colors",
                               getValidationError("firstName") ? "animate-label-flash text-[var(--accent)] font-bold" : "text-[var(--accent)]/80"
                             )}>$ first_name: {getValidationError("firstName") && <span className="text-[10px] opacity-90 font-bold">{getValidationError("firstName")}</span>}</label>
                             <input
+                              id={`${fieldId}-first-name`}
+                              autoComplete="given-name"
                               type="text"
                               className="w-full bg-transparent border-b border-border focus:border-[var(--accent)] outline-none font-mono text-sm text-[var(--accent)] p-0 pb-0.5 focus:ring-0 transition-colors"
                               value={form.firstName}
@@ -308,8 +311,10 @@ export default function ContactModalProvider({ children }: { children: ReactNode
                           </div>
 
                           <div className="flex flex-col gap-1 py-1">
-                            <label className="font-mono text-xs text-[var(--accent)]/80 select-none">$ last_name:</label>
+                            <label htmlFor={`${fieldId}-last-name`} className="font-mono text-xs text-[var(--accent)]/80 select-none">$ last_name:</label>
                             <input
+                              id={`${fieldId}-last-name`}
+                              autoComplete="family-name"
                               type="text"
                               className="w-full bg-transparent border-b border-border focus:border-[var(--accent)] outline-none font-mono text-sm text-[var(--accent)] p-0 pb-0.5 focus:ring-0 transition-colors"
                               value={form.lastName}
@@ -320,11 +325,13 @@ export default function ContactModalProvider({ children }: { children: ReactNode
 
                         <div className="grid grid-cols-1 tablet:grid-cols-2 gap-4">
                           <div className="flex flex-col gap-1 py-1">
-                            <label className={cn(
+                            <label htmlFor={`${fieldId}-email`} className={cn(
                               "font-mono text-xs select-none transition-colors",
                               getValidationError("email") ? "animate-label-flash text-[var(--accent)] font-bold" : "text-[var(--accent)]/80"
                             )}>$ email: {getValidationError("email") && <span className="text-[10px] opacity-90 font-bold">{getValidationError("email")}</span>}</label>
                             <input
+                              id={`${fieldId}-email`}
+                              autoComplete="email"
                               type="email"
                               className="w-full bg-transparent border-b border-border focus:border-[var(--accent)] outline-none font-mono text-sm text-[var(--accent)] p-0 pb-0.5 focus:ring-0 transition-colors"
                               value={form.email}
@@ -335,11 +342,13 @@ export default function ContactModalProvider({ children }: { children: ReactNode
                           </div>
 
                           <div className="flex flex-col gap-1 py-1">
-                            <label className={cn(
+                            <label htmlFor={`${fieldId}-phone`} className={cn(
                               "font-mono text-xs select-none transition-colors",
                               getValidationError("phone") ? "animate-label-flash text-[var(--accent)] font-bold" : "text-[var(--accent)]/80"
                             )}>$ phone: {getValidationError("phone") && <span className="text-[10px] opacity-90 font-bold">{getValidationError("phone")}</span>}</label>
                             <input
+                              id={`${fieldId}-phone`}
+                              autoComplete="tel"
                               type="tel"
                               className="w-full bg-transparent border-b border-border focus:border-[var(--accent)] outline-none font-mono text-sm text-[var(--accent)] p-0 pb-0.5 focus:ring-0 transition-colors"
                               value={form.phone}
@@ -350,11 +359,12 @@ export default function ContactModalProvider({ children }: { children: ReactNode
                         </div>
 
                         <div className="flex flex-col gap-1 py-1">
-                          <label className={cn(
+                          <label htmlFor={`${fieldId}-subject`} className={cn(
                             "font-mono text-xs select-none transition-colors",
                             getValidationError("subject") ? "animate-label-flash text-[var(--accent)] font-bold" : "text-[var(--accent)]/80"
                           )}>$ subject: {getValidationError("subject") && <span className="text-[10px] opacity-90 font-bold">{getValidationError("subject")}</span>}</label>
                           <input
+                            id={`${fieldId}-subject`}
                             type="text"
                             className="w-full bg-transparent border-b border-border focus:border-[var(--accent)] outline-none font-mono text-sm text-[var(--accent)] p-0 pb-0.5 focus:ring-0 transition-colors"
                             value={form.subject}
@@ -365,11 +375,12 @@ export default function ContactModalProvider({ children }: { children: ReactNode
                         </div>
 
                         <div className="flex flex-col gap-2 py-1">
-                          <label className={cn(
+                          <label htmlFor={`${fieldId}-message`} className={cn(
                             "font-mono text-xs select-none transition-colors",
                             getValidationError("message") ? "animate-label-flash text-[var(--accent)] font-bold" : "text-[var(--accent)]/80"
                           )}>$ message_body: {getValidationError("message") && <span className="text-[10px] opacity-90 font-bold">{getValidationError("message")}</span>}</label>
                           <textarea
+                            id={`${fieldId}-message`}
                             rows={4}
                             className="w-full bg-transparent border border-border focus:border-[var(--accent)] rounded-md p-2.5 outline-none font-mono text-sm text-[var(--accent)] resize-none transition-colors"
                             value={form.message}

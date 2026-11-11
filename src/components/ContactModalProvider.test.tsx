@@ -42,6 +42,26 @@ describe("ContactModalProvider dialog", () => {
     expect(dialog.contains(document.activeElement)).toBe(true);
   });
 
+  it("gives every form field an accessible name from its visible label", () => {
+    mount();
+    const dialog = screen.getByRole("dialog");
+    const fields = dialog.querySelectorAll("form input:not([type=hidden]), form textarea, form select");
+    expect(fields).toHaveLength(6);
+    const names = ["first_name", "last_name", "email", "phone", "subject", "message_body"];
+    const labelled = names.map((name) => screen.getByLabelText(new RegExp(`^\\$ ${name}:`)));
+    expect(new Set(labelled).size).toBe(6);
+    expect(new Set(labelled.map((el) => el.id)).size).toBe(6);
+    expect(labelled.map((el) => el.getAttribute("autocomplete"))).toEqual([
+      "given-name",
+      "family-name",
+      "email",
+      "tel",
+      null,
+      null,
+    ]);
+    for (const field of fields) expect(labelled).toContain(field);
+  });
+
   it("closes on Escape and returns focus to the opener", async () => {
     const opener = mount();
     fireEvent.keyDown(window, { key: "Escape" });
