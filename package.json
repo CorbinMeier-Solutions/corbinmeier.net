@@ -7,7 +7,7 @@
     "predev": "node scripts/sync-project-images.mjs",
     "dev": "react-router dev",
     "prebuild": "node scripts/sync-project-images.mjs",
-    "build": "node scripts/check-turnstile-key.mjs && node scripts/site-url.mjs >/dev/null && react-router build && bash scripts/finish-build.sh && node scripts/build-llms.mjs",
+    "build": "node scripts/check-turnstile-key.mjs && node scripts/site-url.mjs >/dev/null && react-router build && bash scripts/finish-build.sh && node scripts/build-llms.mjs && node scripts/verify-build.mjs",
     "preview": "npx wrangler pages dev build/client",
     "lint": "eslint .",
     "check": "tsc --noEmit",

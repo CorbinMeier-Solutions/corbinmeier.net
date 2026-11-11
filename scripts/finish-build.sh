@@ -9,8 +9,10 @@
 #             Directories that are tier-3 rewrite targets in public/_redirects (`/x/*  /x/  200`) stay.
 #          3. Origin = the canonical origin of build/client/index.html (must be https).
 #          4. sitemap.xml, only when public/sitemap.xml does not exist: one <loc> per page by its canonical
-#             URL, sorted, no <lastmod> (a build date is not a real last change). Skips 404.html, Google
-#             verification files and noindex pages.
+#             URL, sorted. <lastmod> (YYYY-MM-DD) = the newest git commit date of the route's page module (src/routes.ts
+#             -> src/pages/<Page>.tsx) and the src/data/ modules it imports; never the build date (requirement
+#             prerendering). Git history missing or shallow: every <lastmod> is omitted and one log line says why.
+#             Skips 404.html, Google verification files and noindex pages.
 #          5. robots.txt, only when public/robots.txt does not exist: allow all + Sitemap line.
 # Success: prints "FINISH PASS". Failure: "FINISH FAIL: <why>" and exit 1.
 set -euo pipefail
@@ -58,13 +60,13 @@ done < <(find "$OUT" -mindepth 2 -name index.html -not -path "$OUT/assets/*" | s
 SITEMAP_PUBLIC=no; ROBOTS_PUBLIC=no
 [ -f "$ROOT/public/sitemap.xml" ] && SITEMAP_PUBLIC=yes
 [ -f "$ROOT/public/robots.txt" ] && ROBOTS_PUBLIC=yes
-python3 -I - "$OUT" "$SITEMAP_PUBLIC" "$ROBOTS_PUBLIC" <<'PY' || exit 1
-import os, sys
+python3 -I - "$ROOT" "$OUT" "$SITEMAP_PUBLIC" "$ROBOTS_PUBLIC" <<'PY' || exit 1
+import os, re, subprocess, sys
 from html.parser import HTMLParser
 from urllib.parse import urlparse
 from xml.sax.saxutils import escape
 
-out, sm_public, rb_public = sys.argv[1], sys.argv[2] == "yes", sys.argv[3] == "yes"
+root, out, sm_public, rb_public = sys.argv[1], sys.argv[2], sys.argv[3] == "yes", sys.argv[4] == "yes"
 
 
 def fail(msg):
@@ -95,6 +97,63 @@ def scan(path):
     return h
 
 
+def git(*args):
+    r = subprocess.run(["git", "-C", root, *args], capture_output=True, text=True)
+    return r.stdout.strip() if r.returncode == 0 else None
+
+
+def history_problem():
+    """Why git dates cannot be trusted, or None when the history is complete."""
+    if git("rev-parse", "--is-inside-work-tree") != "true":
+        return "no git history"
+    if git("rev-parse", "--is-shallow-repository") != "false":
+        return "shallow git history"
+    return None
+
+
+def route_modules():
+    """{route path: [source files]}: the page module from src/routes.ts plus the src/data modules it imports."""
+    try:
+        routes = open(os.path.join(root, "src", "routes.ts"), encoding="utf-8").read()
+    except OSError:
+        return {}
+    found = {"/": re.findall(r"index\(\s*['\"]([^'\"]+)['\"]", routes)}
+    for path, page in re.findall(r"route\(\s*['\"]([^'\"]+)['\"]\s*,\s*['\"]([^'\"]+)['\"]", routes):
+        found["/" + path] = [page]
+    mods = {}
+    for route, pages in found.items():
+        files = []
+        for page in pages:
+            files.append(os.path.join("src", page))
+            try:
+                src = open(os.path.join(root, "src", page), encoding="utf-8").read()
+            except OSError:
+                continue
+            for imp in re.findall(r"from\s+['\"]@/data/([^'\"]+)['\"]", src):
+                for cand in (imp, imp + ".ts", imp + ".json", imp + "/index.ts"):
+                    if os.path.isfile(os.path.join(root, "src", "data", cand)):
+                        files.append(os.path.join("src", "data", cand))
+                        break
+        mods[route] = files
+    return mods
+
+
+def lastmods(urls, origin):
+    """{url: YYYY-MM-DD} from git, or {} (with one log line) when the history is unusable."""
+    problem = history_problem()
+    if problem:
+        print("FINISH NOTE: sitemap <lastmod> omitted for every URL: " + problem)
+        return {}
+    mods, dates = route_modules(), {}
+    for url in urls:
+        route = url[len(origin):] or "/"
+        files = [f for f in mods.get(route, []) if os.path.isfile(os.path.join(root, f))]
+        date = git("log", "-1", "--format=%cs", "--", *files) if files else None
+        if date:
+            dates[url] = date
+    return dates
+
+
 home = scan(os.path.join(out, "index.html"))
 pu = urlparse(home.canon or "")
 if pu.scheme != "https" or not pu.netloc:
@@ -119,10 +178,12 @@ if not sm_public:
             locs.add(h.canon)
     if not locs:
         fail("no pages to list in the sitemap")
+    dates = lastmods(locs, origin)
     with open(os.path.join(out, "sitemap.xml"), "w", encoding="utf-8") as f:
         f.write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n')
         for loc in sorted(locs):
-            f.write("  <url><loc>%s</loc></url>\n" % escape(loc))
+            mod = "<lastmod>%s</lastmod>" % dates[loc] if loc in dates else ""
+            f.write("  <url><loc>%s</loc>%s</url>\n" % (escape(loc), mod))
         f.write("</urlset>\n")
 
 if not rb_public:
