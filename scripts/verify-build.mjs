@@ -5,6 +5,7 @@
 //          2. Every indexable page (no robots noindex) has exactly one <link rel="canonical">; every noindex page
 //             (/contact, 404) has none.
 //          3. Every sitemap.xml URL appears as a plain <a href> (path or absolute) in at least one other built page.
+//          4. Every <lastmod> in sitemap.xml is a valid YYYY-MM-DD, not later than today.
 //          Skips Google verification files and __spa-fallback.html.
 // Success: prints "VERIFY PASS (<n> pages)". Failure: "VERIFY FAIL: <finding>" per line and exit 1.
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
@@ -29,6 +30,20 @@ export function readPageFacts(html) {
 /** The <loc> values of a sitemap.xml. */
 export function sitemapLocs(xml) {
   return [...xml.matchAll(/<loc>\s*([^<]+?)\s*<\/loc>/g)].map((m) => m[1])
+}
+
+/** The <lastmod> values of a sitemap.xml. */
+export function sitemapLastmods(xml) {
+  return [...xml.matchAll(/<lastmod>\s*([^<]*?)\s*<\/lastmod>/g)].map((m) => m[1])
+}
+
+/** Findings for sitemap <lastmod> values that are not a real YYYY-MM-DD or lie after today (YYYY-MM-DD, UTC). */
+export function lastmodFindings(values, today) {
+  return values.flatMap((value) => {
+    const valid = /^\d{4}-\d{2}-\d{2}$/.test(value) && new Date(value + 'T00:00:00Z').toISOString().startsWith(value)
+    if (!valid) return [`sitemap <lastmod> "${value}" is not a valid YYYY-MM-DD date`]
+    return value > today ? [`sitemap <lastmod> ${value} is later than today (${today})`] : []
+  })
 }
 
 /** Absolute URL without query, hash or trailing slash; null for non-http links. */
@@ -78,8 +93,8 @@ function listPages(dir) {
   })
 }
 
-/** Runs every assertion over a build directory; returns { pages, findings }. */
-export function run(out) {
+/** Runs every assertion over a build directory (today = YYYY-MM-DD, UTC); returns { pages, findings }. */
+export function run(out, today = new Date().toISOString().slice(0, 10)) {
   const files = listPages(out)
   const pages = files.map((path) => ({ file: relative(out, path), ...readPageFacts(readFileSync(path, 'utf8')) }))
   const verificationPath = join(out, VERIFICATION_FILE)
@@ -93,7 +108,10 @@ export function run(out) {
     const home = pages.find((page) => page.file === 'index.html')
     const origin = home && home.canonicals[0] ? new URL(home.canonicals[0]).origin : null
     if (!origin) findings.push('index.html has no canonical to take the origin from')
-    else findings.push(...unlinkedFindings(sitemapLocs(readFileSync(sitemapPath, 'utf8')), pages, origin))
+    else {
+      const xml = readFileSync(sitemapPath, 'utf8')
+      findings.push(...unlinkedFindings(sitemapLocs(xml), pages, origin), ...lastmodFindings(sitemapLastmods(xml), today))
+    }
   }
   return { pages: pages.length, findings }
 }

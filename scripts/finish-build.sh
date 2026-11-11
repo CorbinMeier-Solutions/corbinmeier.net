@@ -9,9 +9,11 @@
 #             Directories that are tier-3 rewrite targets in public/_redirects (`/x/*  /x/  200`) stay.
 #          3. Origin = the canonical origin of build/client/index.html (must be https).
 #          4. sitemap.xml, only when public/sitemap.xml does not exist: one <loc> per page by its canonical
-#             URL, sorted. <lastmod> (YYYY-MM-DD) = the newest git commit date of the route's page module (src/routes.ts
-#             -> src/pages/<Page>.tsx) and the src/data/ modules it imports; never the build date (requirement
-#             prerendering). Git history missing or shallow: every <lastmod> is omitted and one log line says why.
+#             URL, sorted. <lastmod> (YYYY-MM-DD) = the newest git AUTHOR date of the route's page module (src/routes.ts
+#             -> src/pages/<Page>.tsx) and the src/components and src/data modules it imports, transitively;
+#             never the build date (requirement prerendering). A URL whose page cannot be resolved prints
+#             "FINISH NOTE: no lastmod for <url>: <why>". Git history missing or shallow: every <lastmod> is
+#             omitted and one note says why; a shallow clone on Cloudflare Pages (CF_PAGES=1) is unshallowed first.
 #             Skips 404.html, Google verification files and noindex pages.
 #          5. robots.txt, only when public/robots.txt does not exist: allow all + Sitemap line.
 # Success: prints "FINISH PASS". Failure: "FINISH FAIL: <why>" and exit 1.
@@ -107,50 +109,97 @@ def history_problem():
     if git("rev-parse", "--is-inside-work-tree") != "true":
         return "no git history"
     if git("rev-parse", "--is-shallow-repository") != "false":
-        return "shallow git history"
+        if os.environ.get("CF_PAGES") == "1":
+            # Cloudflare Pages clones shallow; the dates need the full history. Never fetched outside Pages.
+            subprocess.run(["git", "-C", root, "fetch", "--unshallow", "--quiet"], capture_output=True, text=True)
+        if git("rev-parse", "--is-shallow-repository") != "false":
+            return "shallow git history"
     return None
 
 
-def route_modules():
-    """{route path: [source files]}: the page module from src/routes.ts plus the src/data modules it imports."""
+IMPORT_RE = re.compile(r"(?:from|import)\s+['\"]([^'\"]+)['\"]")
+TRACKED_DIRS = ("components", "data")
+
+
+def resolve_import(spec, importer):
+    """src-relative path of a local import into src/components or src/data, or None."""
+    if spec.startswith("@/"):
+        base = os.path.join("src", spec[2:])
+    elif spec.startswith("."):
+        base = os.path.normpath(os.path.join(os.path.dirname(importer), spec))
+    else:
+        return None
+    parts = base.split(os.sep)
+    if len(parts) < 3 or parts[0] != "src" or parts[1] not in TRACKED_DIRS:
+        return None
+    for cand in (base, base + ".ts", base + ".tsx", base + ".json", os.path.join(base, "index.ts"), os.path.join(base, "index.tsx")):
+        if os.path.isfile(os.path.join(root, cand)):
+            return cand
+    return None
+
+
+def module_files(page):
+    """The page module plus every src/components and src/data module it reaches, transitively."""
+    seen, queue = [], [os.path.join("src", page)]
+    while queue:
+        cur = queue.pop()
+        if cur in seen:
+            continue
+        seen.append(cur)
+        if not cur.endswith((".ts", ".tsx")):
+            continue
+        try:
+            src = open(os.path.join(root, cur), encoding="utf-8").read()
+        except OSError:
+            continue
+        queue.extend(r for r in (resolve_import(spec, cur) for spec in IMPORT_RE.findall(src)) if r)
+    return seen
+
+
+def route_pages():
+    """{route path: page module under src/} from src/routes.ts, or None when routes.ts is unreadable."""
     try:
         routes = open(os.path.join(root, "src", "routes.ts"), encoding="utf-8").read()
     except OSError:
-        return {}
-    found = {"/": re.findall(r"index\(\s*['\"]([^'\"]+)['\"]", routes)}
+        return None
+    found = {}
+    for page in re.findall(r"index\(\s*['\"]([^'\"]+)['\"]", routes):
+        found["/"] = page
     for path, page in re.findall(r"route\(\s*['\"]([^'\"]+)['\"]\s*,\s*['\"]([^'\"]+)['\"]", routes):
-        found["/" + path] = [page]
-    mods = {}
-    for route, pages in found.items():
-        files = []
-        for page in pages:
-            files.append(os.path.join("src", page))
-            try:
-                src = open(os.path.join(root, "src", page), encoding="utf-8").read()
-            except OSError:
-                continue
-            for imp in re.findall(r"from\s+['\"]@/data/([^'\"]+)['\"]", src):
-                for cand in (imp, imp + ".ts", imp + ".json", imp + "/index.ts"):
-                    if os.path.isfile(os.path.join(root, "src", "data", cand)):
-                        files.append(os.path.join("src", "data", cand))
-                        break
-        mods[route] = files
-    return mods
+        found["/" + path] = page
+    return found
+
+
+def newest_author_date(files):
+    dates = (git("log", "--format=%as", "--", *files) or "").split()
+    return max(dates) if dates else None
 
 
 def lastmods(urls, origin):
-    """{url: YYYY-MM-DD} from git, or {} (with one log line) when the history is unusable."""
+    """{url: YYYY-MM-DD} (newest author date) from git; {} with one note when the history is unusable.
+    Every URL left without a date prints a FINISH NOTE saying why."""
     problem = history_problem()
     if problem:
         print("FINISH NOTE: sitemap <lastmod> omitted for every URL: " + problem)
         return {}
-    mods, dates = route_modules(), {}
-    for url in urls:
+    pages = route_pages()
+    if pages is None:
+        print("FINISH NOTE: sitemap <lastmod> omitted for every URL: src/routes.ts not readable")
+        return {}
+    dates = {}
+    for url in sorted(urls):
         route = url[len(origin):] or "/"
-        files = [f for f in mods.get(route, []) if os.path.isfile(os.path.join(root, f))]
-        date = git("log", "-1", "--format=%cs", "--", *files) if files else None
-        if date:
-            dates[url] = date
+        page = pages.get(route)
+        if page is None:
+            print("FINISH NOTE: no lastmod for %s: no route %s in src/routes.ts" % (url, route))
+        elif not os.path.isfile(os.path.join(root, "src", page)):
+            print("FINISH NOTE: no lastmod for %s: page module src/%s not found" % (url, page))
+        else:
+            date = newest_author_date(module_files(page))
+            if date:
+                dates[url] = date
+            else:
+                print("FINISH NOTE: no lastmod for %s: no git commit touches src/%s" % (url, page))
     return dates
 
 

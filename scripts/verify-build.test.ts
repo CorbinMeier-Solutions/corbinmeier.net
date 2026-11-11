@@ -1,6 +1,12 @@
-import { describe, expect, it } from 'vitest'
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { afterEach, describe, expect, it } from 'vitest'
 import {
   canonicalFindings,
+  lastmodFindings,
+  run,
+  sitemapLastmods,
   normalizeUrl,
   readPageFacts,
   sitemapLocs,
@@ -62,5 +68,61 @@ describe('sitemap link assertion', () => {
     const selfOnly = { file: 'pricing.html', canonicals: [ORIGIN + '/pricing'], hrefs: ['/pricing'] }
     const findings = unlinkedFindings(locs, [{ ...home, hrefs: [] }, selfOnly], ORIGIN)
     expect(findings).toHaveLength(2)
+  })
+})
+
+describe('lastmodFindings', () => {
+  it('accepts real dates up to today and reads them from the xml', () => {
+    const xml = '<url><loc>a</loc><lastmod>2026-11-03</lastmod></url><url><loc>b</loc><lastmod> 2026-11-10 </lastmod></url>'
+    expect(sitemapLastmods(xml)).toEqual(['2026-11-03', '2026-11-10'])
+    expect(lastmodFindings(sitemapLastmods(xml), '2026-11-10')).toEqual([])
+  })
+  it('flags malformed, impossible and future dates', () => {
+    const findings = lastmodFindings(['2026-11-3', '2026-02-30', '2026-11-11', ''], '2026-11-10')
+    expect(findings).toHaveLength(4)
+    expect(findings[2]).toContain('later than today')
+  })
+})
+
+describe('run over a fixture build', () => {
+  let dir = ''
+  afterEach(() => rmSync(dir, { recursive: true, force: true }))
+
+  const html = (canonical: string, links: string[] = []) =>
+    `<html><head><link rel="canonical" href="${canonical}"></head><body>${links.map((l) => `<a href="${l}">x</a>`).join('')}</body></html>`
+
+  function fixture(sitemap: string | null, extra: Record<string, string> = {}) {
+    dir = mkdtempSync(join(tmpdir(), 'verify-build-'))
+    mkdirSync(join(dir, 'assets'))
+    mkdirSync(join(dir, '.hidden'))
+    const files: Record<string, string> = {
+      'index.html': html(ORIGIN, ['/pricing']),
+      'pricing.html': html(ORIGIN + '/pricing', ['/']),
+      'googlef16b5b81923cc5d2.html': line,
+      'google1234abcd.html': '<html></html>',
+      '__spa-fallback.html': '<html></html>',
+      'assets/skipped.html': '<html></html>',
+      '.hidden/skipped.html': '<html></html>',
+      ...extra,
+    }
+    if (sitemap !== null) files['sitemap.xml'] = sitemap
+    for (const [name, content] of Object.entries(files)) writeFileSync(join(dir, name), content)
+  }
+  const urlset = (lastmod = '') =>
+    `<urlset><url><loc>${ORIGIN}</loc>${lastmod}</url><url><loc>${ORIGIN}/pricing</loc>${lastmod}</url></urlset>`
+
+  it('passes a clean build and counts only real pages', () => {
+    fixture(urlset('<lastmod>2026-11-03</lastmod>'))
+    expect(run(dir, '2026-11-10')).toEqual({ pages: 2, findings: [] })
+  })
+  it('reports a missing sitemap', () => {
+    fixture(null)
+    expect(run(dir, '2026-11-10').findings).toEqual(['sitemap.xml is missing from the build'])
+  })
+  it('reports bad lastmod dates and a wrong verification file by name', () => {
+    fixture(urlset('<lastmod>2027-01-01</lastmod>'), { 'googlef16b5b81923cc5d2.html': 'wrong' })
+    const findings = run(dir, '2026-11-10').findings
+    expect(findings.some((f) => f.includes('googlef16b5b81923cc5d2.html must contain'))).toBe(true)
+    expect(findings.filter((f) => f.includes('later than today'))).toHaveLength(2)
   })
 })
