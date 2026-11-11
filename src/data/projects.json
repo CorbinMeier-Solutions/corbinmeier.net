@@ -1032,7 +1032,7 @@
       "CSV Export",
       "Data Filtering"
     ],
-    "public-url": "https://github.com/CorbinIvon/gestational_diabetes_tracking_assistant",
+    "public-url": "https://github.com/CorbinMeier/gestational_diabetes_tracking_assistant",
     "description": "A Flutter app for quick number tracking, CSV exporting, and filtered data views to assist gestational diabetes monitoring (college project).",
     "body": "<p>This tool helps users log blood glucose readings quickly, export sessions as CSV for sharing with clinicians, and filter/view trends over time. Built with usability and quick data entry in mind.</p>",
     "images": [],
@@ -1048,7 +1048,7 @@
       "Python",
       "API"
     ],
-    "public-url": "https://github.com/CorbinIvon/python-media-control-api",
+    "public-url": "https://github.com/CorbinMeier/python-media-control-api",
     "description": "Python-based API for programmatic media control and device management, built as a college project.",
     "body": "<p>A lightweight Python API that exposes programmatic controls for media playback and device discovery on local networks. Useful as a centralized control layer for automation scripts and integrations.</p>",
     "images": [],
@@ -1066,7 +1066,7 @@
       "MySQL",
       "WebSockets"
     ],
-    "public-url": "https://github.com/CorbinIvon/2024fa-csci-36-inventory-system",
+    "public-url": "https://github.com/CorbinMeier/2024fa-csci-36-inventory-system",
     "description": "College inventory system using a GraphQL API and MySQL with WebSocket-based live updates for real-time inventory and asset tracking.",
     "body": "<p>Built as a college project, this inventory and asset management app uses a GraphQL backend and WebSocket-powered live updates for changes to inventory counts, checkouts, and reservations.</p><p>It demonstrates real-time collaboration patterns and efficient querying with GraphQL.</p>",
     "images": [],
@@ -1108,7 +1108,7 @@
       "prisma",
       "Fastify"
     ],
-    "public-url": "https://github.com/CorbinIvon/React-Lab-CSCI-031",
+    "public-url": "https://github.com/CorbinMeier/React-Lab-CSCI-031",
     "description": "The work from my CSCI 031 college course, including web apps and tools built with modern technologies.",
     "body": "<p>Aggregated course work showcasing web apps, tooling, and experiments. Includes examples using modern stacks like Next.js, Supabase, Prisma, and Turborepo monorepos.</p>",
     "images": [
@@ -1128,12 +1128,12 @@
       "Windows Notifications",
       "LAN Messaging"
     ],
-    "public-url": "https://github.com/CorbinIvon/toaster",
+    "public-url": "https://github.com/CorbinMeier/toaster",
     "description": "Windows Toast and notification system enabling LAN messenger between devices for quick local notifications.",
     "body": "<p>A small utility that sends Windows toast notifications across a LAN. Designed for quick local messaging without a centralized server-great for internal team alerts or small office broadcasts.</p>",
     "images": [
       {
-        "src": "https://github.com/CorbinIvon/toaster/assets/20233488/ca8a8c67-9aa0-4dbe-91b6-cb2f077f842a"
+        "src": "https://github.com/CorbinMeier/toaster/assets/20233488/ca8a8c67-9aa0-4dbe-91b6-cb2f077f842a"
       }
     ],
     "archived": true,
