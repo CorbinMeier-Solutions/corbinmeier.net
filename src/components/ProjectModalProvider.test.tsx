@@ -47,7 +47,32 @@ function mount() {
   return opener;
 }
 
+function accessibleName(button: HTMLElement): string {
+  const label = button.getAttribute("aria-label") ?? "";
+  const imageAlt = Array.from(button.querySelectorAll("img"))
+    .map((img) => img.getAttribute("alt") ?? "")
+    .join(" ");
+  return (label || `${button.textContent ?? ""} ${imageAlt}`).trim();
+}
+
+function unnamedButtons(): string[] {
+  return screen
+    .getAllByRole("dialog", { hidden: true })
+    .flatMap((dialog) => Array.from(dialog.querySelectorAll<HTMLElement>("button")))
+    .filter((button) => accessibleName(button) === "")
+    .map((button) => button.outerHTML);
+}
+
 describe("ProjectModalProvider dialog", () => {
+  it("gives every button in the dialog and the full screen view an accessible name", () => {
+    mount();
+    expect(unnamedButtons()).toEqual([]);
+    fireEvent.click(screen.getByLabelText("View full screen"));
+    expect(screen.getAllByRole("dialog")).toHaveLength(2);
+    expect(unnamedButtons()).toEqual([]);
+    expect(screen.getAllByLabelText("Next image")).toHaveLength(2);
+  });
+
   it("is a modal dialog named by the project title", () => {
     mount();
     const dialog = screen.getByRole("dialog");

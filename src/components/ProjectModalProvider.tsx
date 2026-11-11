@@ -201,7 +201,8 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
               <div className="flex-1 flex flex-col tablet:flex-row overflow-hidden min-h-0">
                 {/* Image Section */}
                 <div className="shrink-0 tablet:shrink tablet:w-3/5 min-h-0 bg-muted/20 relative overflow-hidden flex flex-col border-b tablet:border-b-0 tablet:border-r border-border">
-                  <div className="aspect-video max-h-[40dvh] tablet:aspect-auto tablet:max-h-none tablet:flex-1 tablet:min-h-0 relative overflow-hidden group">
+                  {/* Keep the 16:9 box at every width: its slides are absolutely positioned, so without an intrinsic height the panel was sized by the text column beside it. */}
+                  <div className="aspect-video max-h-[40dvh] tablet:max-h-none tablet:flex-1 tablet:min-h-0 relative overflow-hidden group">
                     <AnimatePresence initial={false} custom={direction}>
                       <motion.div
                         key={activeIndex}
@@ -279,14 +280,16 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
                     {/* Navigation Arrows (Desktop) */}
                     {totalSlides > 1 && (
                       <>
-                        <button 
+                        <button
                           onClick={(e) => { e.stopPropagation(); paginate(-1); }}
+                          aria-label="Previous image"
                           className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-2 bg-background/60 hover:bg-background/80 border border-white/10 rounded-full transition-[background-color,opacity] opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100"
                         >
                           <ChevronLeft className="w-5 h-5" />
                         </button>
-                        <button 
+                        <button
                           onClick={(e) => { e.stopPropagation(); paginate(1); }}
+                          aria-label="Next image"
                           className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-2 bg-background/60 hover:bg-background/80 border border-white/10 rounded-full transition-[background-color,opacity] opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100"
                         >
                           <ChevronRight className="w-5 h-5" />
@@ -320,6 +323,7 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
                         return (
                           <button
                             key={img.src}
+                            aria-label={`Show image ${idx + 1} of ${project.images?.length}${img.label ? `: ${img.label}` : ""}`}
                             onClick={() => {
                               setDirection(slideIdx > activeIndex ? 1 : -1);
                               setActiveIndex(slideIdx);
@@ -545,12 +549,14 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
                 <>
                   <button
                     onClick={(e) => { e.stopPropagation(); paginate(-1); }}
+                    aria-label="Previous image"
                     className="absolute left-0 top-1/2 -translate-y-1/2 p-6 text-white/20 hover:text-white transition-colors"
                   >
                     <ChevronLeft className="w-12 h-12" />
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); paginate(1); }}
+                    aria-label="Next image"
                     className="absolute right-0 top-1/2 -translate-y-1/2 p-6 text-white/20 hover:text-white transition-colors"
                   >
                     <ChevronRight className="w-12 h-12" />
