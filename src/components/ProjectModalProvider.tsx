@@ -173,7 +173,7 @@ export default function ProjectModalProvider({ children }: { children: ReactNode
                 title={`${project.slug}.${project.extension || "sh"}`}
                 icon={<Code2 className="w-4 h-4 text-accent" />}
                 showDots={true}
-                onDotClick={close}
+                dotAction={{ label: "Close project details", run: close }}
               />
 
               {hasProjectNav && (

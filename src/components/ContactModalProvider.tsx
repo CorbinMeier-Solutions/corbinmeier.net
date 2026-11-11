@@ -223,7 +223,7 @@ export default function ContactModalProvider({ children }: { children: ReactNode
                 title="contact_terminal.sh"
                 icon={<Save className="w-4 h-4 text-accent" />}
                 showDots={true}
-                onDotClick={close}
+                dotAction={{ label: "Close contact form", run: close }}
               />
 
               <div className="flex-1 overflow-y-auto p-6 tablet:p-8">

@@ -92,17 +92,20 @@ export function CyberCodeSectionLabel({ className }: { className?: string }) {
   );
 }
 
+/** What the chrome's dots do when clicked; `label` is the accessible name. */
+export type DotAction = { label: string; run: () => void };
+
 export function CyberCodeWindowChrome({
   title,
   icon,
   showDots = true,
-  onDotClick,
+  dotAction,
   className,
 }: {
   title: ReactNode;
   icon?: ReactNode;
   showDots?: boolean;
-  onDotClick?: () => void;
+  dotAction?: DotAction;
   className?: string;
 }) {
   const dotColors = ["#ff5f57", "#febc2e", "#28c840"];
@@ -111,17 +114,22 @@ export function CyberCodeWindowChrome({
       {showDots && (
         <div className="flex gap-1.5">
           {dotColors.map((color) =>
-            onDotClick ? (
+            dotAction ? (
               <button
                 key={color}
                 type="button"
-                onClick={onDotClick}
-                aria-label="Toggle window"
+                onClick={dotAction.run}
+                aria-label={dotAction.label}
                 className="h-2.5 w-2.5 rounded-full transition-transform hover:scale-125"
                 style={{ backgroundColor: color }}
               />
             ) : (
-              <span key={color} className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
+              <span
+                key={color}
+                aria-hidden="true"
+                className="h-2.5 w-2.5 rounded-full"
+                style={{ backgroundColor: color }}
+              />
             )
           )}
         </div>
@@ -144,7 +152,7 @@ export function CyberCodeTerminalWindow({
   accent = "primary",
   showDots = true,
   collapsible = false,
-  onDotClick,
+  dotAction,
   bodyClassName,
   className,
   children,
@@ -154,13 +162,16 @@ export function CyberCodeTerminalWindow({
   accent?: CyberAccent;
   showDots?: boolean;
   collapsible?: boolean;
-  onDotClick?: () => void;
+  dotAction?: DotAction;
   bodyClassName?: string;
   className?: string;
   children: ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(false);
-  const handleDotClick = onDotClick || (collapsible ? () => setCollapsed((c) => !c) : undefined);
+  const collapseAction: DotAction | undefined = collapsible
+    ? { label: collapsed ? "Expand window" : "Collapse window", run: () => setCollapsed((c) => !c) }
+    : undefined;
+  const activeDotAction = dotAction ?? collapseAction;
   return (
     <div
       className={cx(
@@ -173,7 +184,7 @@ export function CyberCodeTerminalWindow({
         title={title}
         icon={icon}
         showDots={showDots}
-        onDotClick={handleDotClick}
+        dotAction={activeDotAction}
       />
       <div
         className={cx(
