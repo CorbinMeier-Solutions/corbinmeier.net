@@ -5,9 +5,24 @@ import {
   readPageFacts,
   sitemapLocs,
   unlinkedFindings,
+  verificationFindings,
 } from './verify-build.mjs'
 
 const ORIGIN = 'https://example.test'
+const line = 'google-site-verification: googlef16b5b81923cc5d2.html'
+
+describe('verificationFindings', () => {
+  it('accepts the exact line with or without one trailing newline', () => {
+    expect(verificationFindings(line)).toEqual([])
+    expect(verificationFindings(line + '\n')).toEqual([])
+  })
+  it('flags a missing file and altered content', () => {
+    expect(verificationFindings(null)[0]).toContain('missing')
+    expect(verificationFindings(line + '\n\n')).toHaveLength(1)
+    expect(verificationFindings('<html></html>')).toHaveLength(1)
+  })
+})
+
 describe('readPageFacts + canonicalFindings', () => {
   const page = (head: string, body = '') => readPageFacts(`<html><head>${head}</head><body>${body}</body></html>`)
   const canon = '<link rel="canonical" href="https://example.test/a">'
